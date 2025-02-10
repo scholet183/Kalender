@@ -1,7 +1,5 @@
 name: automatic_deploy
-on: 
-  push:
-    branches: [automatic_deployment]
+on: push
 
 jobs:
   configure_page:
