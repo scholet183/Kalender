@@ -16,8 +16,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
       - run: ng build
-        with:
-          working-directory: Website/frontend_ng
+        working-directory: Website/frontend_ng
       - run: |
           mkdir _site/
           mv Website/frontend_ng/dist/frontend_ng/browser _site/
