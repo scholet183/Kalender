@@ -1,5 +1,5 @@
 name: automatic_deploy
-on: pull_request
+on: push #pull_request
 
 jobs:
   configure_page:
@@ -17,7 +17,7 @@ jobs:
           ref: ${{ github.head_ref }}
       - run: |
           mkdir _site/
-          mv Website/index.html _site/index.html
+          mv Website/frontend_ng/dist/frontend_ng/browser _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
       - name: Deploy to GitHub Pages
