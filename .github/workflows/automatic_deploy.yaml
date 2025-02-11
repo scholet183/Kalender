@@ -22,7 +22,9 @@ jobs:
         with:
           node-version: '22'
       - name: Setup Angular
-        run: npm install -g @angular/cli
+        run: |
+          npm install -g @angular/cli
+          npm install --save-dev @angular-devkit/build-angular
       # Build Frontend Applikation
       - run: ng build
         working-directory: Website/frontend_ng
