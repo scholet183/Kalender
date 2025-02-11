@@ -14,7 +14,10 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/frontend",
-            "index": "src/index.html",
+            "index": {
+              "input": "src/index.html",
+              "output": "dist/index.html"
+            },
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
@@ -95,6 +98,9 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }

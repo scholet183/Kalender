@@ -2,14 +2,14 @@ name: automatic_deploy
 on: pull_request
 
 jobs:
-  configure_page:
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  deploy_page:
+#    permissions:
+#      contents: read
+#      pages: write
+#      id-token: write
+#    environment:
+#      name: github-pages
+#      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       # Repository des PR checkout
@@ -27,14 +27,16 @@ jobs:
           npm install --save-dev @angular-devkit/build-angular
         working-directory: Website/frontend
       # Build Frontend Applikation
-      - run: ng build --base-href /frontend
+      - run: | 
+          ng build --base-href login 
+          ng deploy --base-href login 
         working-directory: Website/frontend
-      - run: |
-          mkdir _site/
-          mv Website/frontend/dist/frontend/browser/* _site/
-          mv _site/index.* _site/index.html
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+#      - run: |
+#          mkdir _site/
+#          mv Website/frontend/dist/frontend/browser/* _site/
+#          mv _site/index.* _site/index.html
+#      - uses: actions/configure-pages@v5
+#      - uses: actions/upload-pages-artifact@v3
+#      - name: Deploy to GitHub Pages
+#        id: deployment
+#        uses: actions/deploy-pages@v4
