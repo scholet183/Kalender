@@ -12,12 +12,26 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      # Repository des PR checkout
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+      # Installiere Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Setup Angular
+        run: |
+          npm install -g @angular/cli
+          npm install --save-dev @angular-devkit/build-angular
+        working-directory: Website/frontend
+      # Build Frontend Applikation
+      - run: ng build --base-href /frontend
+        working-directory: Website/frontend
       - run: |
           mkdir _site/
-          mv Website/index.html _site/index.html
+          mv Website/frontend/dist/frontend/browser/* _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
       - name: Deploy to GitHub Pages
