@@ -31,7 +31,7 @@ jobs:
         working-directory: Website/frontend_ng
       - run: |
           mkdir _site/
-          mv Website/frontend_ng/dist/frontend_ng/browser _site/
+          mv Website/frontend_ng/dist/frontend_ng/browser/* _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
       - name: Deploy to GitHub Pages
