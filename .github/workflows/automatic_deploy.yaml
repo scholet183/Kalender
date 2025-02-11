@@ -21,6 +21,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Setup Angular
+        run: npm install -g @angular/cli
       # Build Frontend Applikation
       - run: ng build
         working-directory: Website/frontend_ng
