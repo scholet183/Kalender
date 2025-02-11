@@ -32,6 +32,7 @@ jobs:
       - run: |
           mkdir _site/
           mv Website/frontend/dist/frontend/browser/* _site/
+          mv _site/index.* _site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
       - name: Deploy to GitHub Pages
