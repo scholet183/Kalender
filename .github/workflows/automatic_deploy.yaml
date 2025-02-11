@@ -27,7 +27,7 @@ jobs:
           npm install --save-dev @angular-devkit/build-angular
         working-directory: Website/frontend_ng
       # Build Frontend Applikation
-      - run: ng build
+      - run: ng build --base-href /frontend_ng
         working-directory: Website/frontend_ng
       - run: |
           mkdir _site/
