@@ -1,0 +1,36 @@
+/* src/app/login/login.component.css */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #1e3335 0%, #0b1524 100%);
+  padding: 20px;
+}
+
+mat-card-title {
+  margin-bottom: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.button-container {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.error-message {
+  color: #ff1744;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}

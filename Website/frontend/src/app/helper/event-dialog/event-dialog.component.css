@@ -1,0 +1,17 @@
+.full-width {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  /* Definiert eine Zeile, in der die Elemente nebeneinander stehen */
+  .row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  /* Jedes Element in der Zeile nimmt gleichen Platz ein */
+  .half-width {
+    flex: 1;
+  }
+  
