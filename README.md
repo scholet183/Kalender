@@ -32,8 +32,16 @@ DELETE /users/{id} → Benutzer löschen
 - docker
 - docker-compose
 
-```
-$ cd backend/
-$ mvn spring-boot:run
-``` 
 
+## Set-Up Backend
+```
+$ cd Website/backend
+$ mvn spring-boot:run
+```
+
+## Set-Up Frontend
+```
+$ cd Website/frontend
+$ npm install
+$ ng serve
+```
