@@ -1,13 +1,19 @@
 package com.example.backend.service;
 
-import com.example.backend.eto.User;
+import com.example.backend.dto.UserDTO;
 
 import java.util.List;
 
 public interface UserService {
-    User saveUser(User user);
+    UserDTO saveUser(UserDTO userDTO);
 
-    User getUserByID(int id);
+    UserDTO getUserByID(int id);
 
-    List<User> getAllUsers();
+    List<UserDTO> getAllUsers();
+
+    UserDTO updateUser(int id, UserDTO userDTO);
+
+    void deleteUser(int id);
+
+    void updateUserName(int id, UserDTO userDTO);
 }
