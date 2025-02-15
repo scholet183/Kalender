@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setName(user.getName());
-        // Weitere Felder ggf. mappen
+        dto.setEmail(user.getEmail());
         return dto;
     }
 
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setId(userDTO.getId());
         user.setName(userDTO.getName());
-        // Weitere Felder ggf. mappen
+        user.setEmail(userDTO.getEmail());
         return user;
     }
 
