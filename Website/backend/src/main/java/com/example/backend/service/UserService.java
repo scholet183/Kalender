@@ -16,4 +16,6 @@ public interface UserService {
     void deleteUser(int id);
 
     void updateUserName(int id, UserDTO userDTO);
+
+    UserDTO login(UserDTO userDTO);
 }

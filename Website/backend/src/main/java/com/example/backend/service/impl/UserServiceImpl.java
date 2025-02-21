@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
         dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
+        dto.setPassword(user.getPassword());
         return dto;
     }
 
@@ -34,11 +35,23 @@ public class UserServiceImpl implements UserService {
         user.setId(userDTO.getId());
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+        System.out.println(user.getPassword());
         return user;
     }
 
     @Override
     public UserDTO saveUser(UserDTO userDTO) {
+        // Prüfe, ob alle erforderlichen Felder vorhanden sind
+        if (userDTO.getName() == null || userDTO.getEmail() == null || userDTO.getPassword() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name, E-Mail und Passwort müssen angegeben werden.");
+        }
+
+        // Prüfe, ob die E-Mail bereits vergeben ist
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Die E-Mail ist bereits vergeben.");
+        }
+
         User user = convertToEntity(userDTO);
         User savedUser = userRepository.save(user);
         return convertToDto(savedUser);
@@ -88,4 +101,17 @@ public class UserServiceImpl implements UserService {
         user.setName(userDTO.getName());
         userRepository.save(user);
     }
+
+    @Override
+    public UserDTO login(UserDTO userDTO) {
+        // Suche Benutzer per E-Mail (alternativ z. B. per Name, je nach Anforderung)
+        User user = userRepository.findByEmail(userDTO.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Ungültige Zugangsdaten"));
+        // Prüfe, ob das Passwort übereinstimmt
+        if (!user.getPassword().equals(userDTO.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Ungültige Zugangsdaten");
+        }
+        return convertToDto(user);
+    }
+
 }

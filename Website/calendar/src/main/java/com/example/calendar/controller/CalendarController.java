@@ -19,7 +19,7 @@ public class CalendarController {
         return calendarService.addAppointment(appointment);
     }
 
-    @GetMapping("/getAppointment")
+    @GetMapping("/getAppointments")
     public List<Appointment> getAppointments(@RequestParam Integer userId) {
         return calendarService.getAppointmentsById(userId);
     }
