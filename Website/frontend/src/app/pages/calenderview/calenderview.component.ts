@@ -1,26 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EventDialogComponent } from '../../helper/event-dialog/event-dialog.component';
-
+import { UserDTO } from '../../models/userDTO.model';
+import { Router } from '@angular/router';
+import { MatButton } from '@angular/material/button';
+import {AuthService} from "../../services/authService/auth.service";
+import {CalendarService} from "../../services/calendarService/calendar.service";
+import {Appointment} from "../../models/apointment.model";
 
 @Component({
   selector: 'app-calenderview',
   standalone: true,
-  imports: [CommonModule, FullCalendarModule, HttpClientModule, MatDialogModule],
+  imports: [CommonModule, FullCalendarModule, MatDialogModule, MatButton],
   templateUrl: './calenderview.component.html',
   styleUrls: ['./calenderview.component.css']
 })
-export class CalenderviewComponent {
-  // Array für aktuell angezeigte Termine
+export class CalenderviewComponent implements OnInit {
   calendarEvents: any[] = [];
+  currentUser: UserDTO | null = null;
 
-  // Konfiguration für FullCalendar
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin, interactionPlugin],
@@ -28,39 +31,75 @@ export class CalenderviewComponent {
     events: this.calendarEvents
   };
 
-  constructor(private http: HttpClient, private dialog: MatDialog) {}
+  constructor(
+    private authService: AuthService,
+    private calendarService: CalendarService,
+    private dialog: MatDialog,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.currentUser = this.authService.getUser();
+    if (this.currentUser == null) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.fetchAppointments();
+  }
+
+  fetchAppointments(): void {
+    this.calendarService.getAppointments(this.currentUser!.id!)
+      .subscribe({
+        next: (appointments) => {
+          this.calendarEvents = appointments.map(appointment => ({
+            title: appointment.title,
+            start: appointment.startDate,
+            end: appointment.endDate
+          }));
+          this.calendarOptions = { ...this.calendarOptions, events: this.calendarEvents };
+        },
+        error: (error) => {
+          console.error('Fehler beim Laden der Termine', error);
+        }
+      });
+  }
 
   handleDateClick(arg: DateClickArg) {
-    // Öffnet den Dialog und übergibt das angeklickte Datum als Default
     const dialogRef = this.dialog.open(EventDialogComponent, {
       data: { clickedDate: arg.dateStr }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // result enthält: { title, start, end }
-        const newEvent = {
+        const newAppointment: Appointment = {
           title: result.title,
-          start: result.start,
-          end: result.end
+          startDate: result.start,
+          endDate: result.end,
+          userId: this.currentUser!.id!,
+          description: result.description || '',
+          location: result.location || ''
         };
 
-        // Neuen Termin lokal hinzufügen
-        this.calendarEvents = [...this.calendarEvents, newEvent];
-        // Options neu setzen, damit der Kalender aktualisiert wird
-        this.calendarOptions = {
-          ...this.calendarOptions,
-          events: this.calendarEvents
-        };
+        // Lokale Kalenderanzeige aktualisieren
+        this.calendarEvents = [...this.calendarEvents, {
+          title: newAppointment.title,
+          start: newAppointment.startDate,
+          end: newAppointment.endDate
+        }];
+        this.calendarOptions = { ...this.calendarOptions, events: this.calendarEvents };
 
-        // Erstmal nur als Mock: Sendet den neuen Termin an dein Backend
-        // Wird später in eigener Service Klasse implementiert
-        this.http.post('https://dein-backend-api/appointments', newEvent)
+        // Neuen Termin an das Backend senden
+        this.calendarService.addAppointment(newAppointment)
           .subscribe({
             next: response => console.log('Termin erfolgreich gespeichert:', response),
             error: error => console.error('Fehler beim Speichern des Termins:', error)
           });
       }
     });
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

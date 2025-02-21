@@ -1,0 +1,38 @@
+<!-- src/app/login/login.component.html -->
+<div class="registration-container">
+  <mat-card class="registration-card">
+    <mat-card-header>
+      <mat-card-title>Neuen Benutzer registrieren</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Benutzername</mat-label>
+          <input matInput placeholder="Dein Benutzername" [(ngModel)]="name" name="name" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput placeholder="Deine Email" [(ngModel)]="email" name="email" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Passwort</mat-label>
+          <input matInput placeholder="Dein Passwort" [(ngModel)]="password" name="password" type="password" required>
+        </mat-form-field>
+
+        <!-- Fehlermeldung anzeigen -->
+        @if (errorMessage) {
+          <div class="error-message">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <div class="button-container">
+          <button mat-button color="primary" (click)="routeToLogin()">Zurück zum Login</button>
+          <button mat-raised-button color="primary" type="submit">Benutzer registrieren</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

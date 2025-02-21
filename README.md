@@ -3,25 +3,26 @@ DevOps-Projekt: CRUD-Webapplikation
 
 
 # CRUD-Methoden
-Events:
+Appointments: /api/calendar
 
-POST /events → Neues Event erstellen
+POST /addAppointment → Neues Event erstellen
 
-GET /events → Alle Events abrufen
+GET /getAppointments/{id} → Alle Events eines bestimmten Nutzers abrufen
 
-GET /events/{id} → Einzelnes Event abrufen
-
-PUT /events/{id} → Event aktualisieren
-
+(Not yet implemented)
 DELETE /events/{id} → Event löschen
 
-User:
+User: /api/users
 
-POST /users → Neuen Benutzer erstellen
+POST /save → Neuen Benutzer erstellen
 
-PUT /users/{id} → Benutzer aktualisieren
+GET /all → Alle Benutzer erhalten
 
-DELETE /users/{id} → Benutzer löschen
+GET /{id} → ein bestimmten Benutzer erhalten
+
+PUT /{id} → ein bestimmten Benutzer aktualisieren
+
+DELETE /{id} → ein bestimmten Benutzer löschen
 
 # Setup Dev-Environment
 - npm v10.9.0

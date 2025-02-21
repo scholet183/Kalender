@@ -1,0 +1,21 @@
+.calendar-header {
+  position: sticky;
+  top: 0;
+  z-index: 10; /* Höher als der Kalender */
+  background: linear-gradient(135deg, #1e3335 0%, #0b1524 100%);
+  padding: 20px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  gap: 10px;
+  font-size: 1.1em;
+  color: white;
+}
+
+.full-calendar-container {
+  margin: 20px; /* Abstand, damit der Header nicht überdeckt wird */
+}

@@ -30,21 +30,23 @@ export class EventDialogComponent {
     private dialogRef: MatDialogRef<EventDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    // Nutzt das angeklickte Datum als Standard, oder heute
+    // Nutzt das angeklickte Datum als Standard oder heute
     const defaultDate = data && data.clickedDate ? new Date(data.clickedDate) : new Date();
     this.form = this.fb.group({
       title: ['', Validators.required],
       startDate: [defaultDate, Validators.required],
       startTime: ['08:00', Validators.required],
       endDate: [defaultDate, Validators.required],
-      endTime: ['09:00', Validators.required]
+      endTime: ['09:00', Validators.required],
+      description: [''],
+      location: ['']
     });
   }
 
   onSubmit() {
     if (this.form.valid) {
-      const { title, startDate, startTime, endDate, endTime } = this.form.value;
-      
+      const { title, startDate, startTime, endDate, endTime, description, location } = this.form.value;
+
       // Kombiniert Datum und Zeit für den Start
       const [startHour, startMinute] = startTime.split(':').map(Number);
       const start = new Date(startDate);
@@ -55,8 +57,8 @@ export class EventDialogComponent {
       const end = new Date(endDate);
       end.setHours(endHour, endMinute);
 
-      // Schließt den Dialog und gibt die kombinierten Daten zurück
-      this.dialogRef.close({ title, start, end });
+      // Schließt den Dialog und gibt alle kombinierten Daten zurück
+      this.dialogRef.close({ title, start, end, description, location });
     }
   }
 

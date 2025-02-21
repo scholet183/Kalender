@@ -1,5 +1,4 @@
-/* src/app/login/login.component.css */
-.login-container {
+.registration-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,7 +10,7 @@ mat-card-title {
   margin-bottom: 20px;
 }
 
-.login-card {
+.registration-card {
   width: 100%;
   max-width: 400px;
   padding: 20px;
@@ -24,12 +23,13 @@ mat-card-title {
 
 .button-container {
   display: flex;
-  margin-top: 10px;
   justify-content: space-between;
+  margin-top: 10px;
 }
 
 .error-message {
-  color: rgb(186, 26, 26);
+  color: #ff1744;
+  font-weight: bold;
   margin-bottom: 10px;
   text-align: center;
 }
