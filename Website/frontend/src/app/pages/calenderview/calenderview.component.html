@@ -1,1 +1,10 @@
-<full-calendar [options]="calendarOptions"></full-calendar>
+<header class="calendar-header">
+  <div class="user-info">
+    <span class="user-name">{{ currentUser?.name }}</span>
+    <span class="user-email">{{ currentUser?.email }}</span>
+  </div>
+  <button mat-raised-button color="warn" (click)="logout()">Logout</button>
+</header>
+<div class="full-calendar-container">
+  <full-calendar [options]="calendarOptions"></full-calendar>
+</div>
