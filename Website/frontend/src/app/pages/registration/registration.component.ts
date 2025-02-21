@@ -5,7 +5,7 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/mat
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {Router} from "@angular/router";
-import {UserService} from "../../services/user.service";
+import {UserService} from "../../services/userService/user.service";
 
 @Component({
   selector: 'app-registration',

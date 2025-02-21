@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from '../../services/user.service';
-import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/userService/user.service';
+import { AuthService } from '../../services/authService/auth.service';
 import { UserDTO } from '../../models/userDTO.model';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
