@@ -26,7 +26,7 @@ RUN chmod +x /Kalender/start.sh
  
 # Ports freigeben (je nach Bedarf)
 
-EXPOSE 4000 8080 8081 3000
+EXPOSE 4200 8080 8081 3000
  
 # Start-Skript als Container-Befehl festlegen
 
