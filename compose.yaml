@@ -39,7 +39,7 @@ services:
     environment:
       - MARIADB_ROOT_PASSWORD=verysecret
       - MARIADB_DATABASE=calendardatabase
-      - MARIADB_USER=admin
+      - MARIADB_USER=root
       - MARIADB_PASSWORD=verysecret
     ports:
       - "3308:3306"  # Kalender-Datenbank läuft auf Port 3308
