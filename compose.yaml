@@ -1,16 +1,42 @@
-# docker-compose.yml
+version: "3.8"
 
 services:
-  kalender:
+  app:
     build: .
+    container_name: meine-app
+    stdin_open: true  # Für interaktive Shell
+    tty: true         # Verhindert, dass der Container sich sofort beendet
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=my-secret-pw
+    networks:
+      - app-network
+
+  db:
+    image: mariadb:latest
+    container_name: meine-datenbank
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=my-secret-pw
+      - MARIADB_DATABASE=kalender
+      - MARIADB_USER=admin
+      - MARIADB_PASSWORD=adminpass
     ports:
       - "3306:3306"
-      - "4000:4000"
-      - "8081:8081"
-      - "3000:3000"
-      - "8080:8080"
     volumes:
-      - db-data:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - app-network
 
 volumes:
-  db-data:
+  mariadb-data:
+
+networks:
+  app-network:
