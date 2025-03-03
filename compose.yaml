@@ -4,39 +4,53 @@ services:
   app:
     build: .
     container_name: meine-app
-    stdin_open: true  # Für interaktive Shell
-    tty: true         # Verhindert, dass der Container sich sofort beendet
+    stdin_open: true  # Hält den Container offen
+    tty: true
     ports:
       - "4000:4000"
       - "8080:8080"
       - "8081:8081"
     depends_on:
-      - db
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=my-secret-pw
+      - user-db
+      - kalender-db
     networks:
       - app-network
 
-  db:
+  user-db:
     image: mariadb:latest
-    container_name: meine-datenbank
+    container_name: user-datenbank
     restart: always
     environment:
-      - MARIADB_ROOT_PASSWORD=my-secret-pw
-      - MARIADB_DATABASE=kalender
-      - MARIADB_USER=admin
-      - MARIADB_PASSWORD=adminpass
+      - MARIADB_ROOT_PASSWORD=verysecret
+      - MARIADB_DATABASE=userdatabase
+      - MARIADB_USER=root
+      - MARIADB_PASSWORD=verysecret
     ports:
-      - "3306:3306"
+      - "3307:3306"  # User-Datenbank läuft auf Port 3307
     volumes:
-      - mariadb-data:/var/lib/mysql
+      - userdb-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  kalender-db:
+    image: mariadb:latest
+    container_name: kalender-datenbank
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=verysecret
+      - MARIADB_DATABASE=calendardatabase
+      - MARIADB_USER=admin
+      - MARIADB_PASSWORD=verysecret
+    ports:
+      - "3308:3306"  # Kalender-Datenbank läuft auf Port 3308
+    volumes:
+      - kalenderdb-data:/var/lib/mysql
     networks:
       - app-network
 
 volumes:
-  mariadb-data:
+  userdb-data:
+  kalenderdb-data:
 
 networks:
   app-network:
