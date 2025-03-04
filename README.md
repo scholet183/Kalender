@@ -32,12 +32,26 @@ DELETE /{id} → ein bestimmten Benutzer löschen
 - mariadb  Ver 15.1 Distrib 10.6.18-MariaDB
 - docker
 - docker-compose
+- DBeaver (if gui is needed)
+- IntelliJ (as IDE)
+
+## Setup MariaDB
+- MariaDB should run on port 3306
+- username: root
+- password: verysecret
+- create two databases manually:
+-- userdatabase
+-- calendardatabase
 
 
-## Set-Up Backend
+## Set-Up Backend-Microservices
+- both Spring boot Microservices should run at the same time
 ```
-$ cd Website/backend
-$ mvn spring-boot:run
+$ cd Website/user_microservice (or open as new IntelliJ project)
+$ mvn spring-boot:run (or click green Start-Button in IntelliJ)
+
+$ cd Website/calendar_microservice (or open as new IntelliJ project)
+$ mvn spring-boot:run (or click green Start-Button in IntelliJ)
 ```
 
 ## Set-Up Frontend
