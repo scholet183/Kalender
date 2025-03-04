@@ -2,9 +2,5 @@
   "name": "Kalender",
   "lockfileVersion": 3,
   "requires": true,
-  "packages": {
-    "": {
-      "name": "Kalender"
-    }
-  }
+  "packages": {}
 }
