@@ -10,8 +10,9 @@ jobs:
           ref: ${{ github.head_ref }}
       - name: prepare runner
         run: |
-          sudo apt install docker.io
-          sudo apt install docker-compose
+          sudo apt-get update
+          sudo apt-get install docker.io
+          sudo apt-get install docker-compose
       - name: build container
         run: |
           cd Kalender/
