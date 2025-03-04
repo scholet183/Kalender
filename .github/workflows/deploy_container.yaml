@@ -17,3 +17,8 @@ jobs:
           docker-compose up -d
           docker images
           docker container ls
+          docker save $(docker images -q) -o Kalender.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kalender_App
+          path: Kalender.tar
