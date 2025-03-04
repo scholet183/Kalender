@@ -42,9 +42,31 @@ describe('UserService', () => {
         expect(responseUser).toEqual(userDTO);
       }
     );
-    //Assert
+    //Asert
     const request = httpTestingController.expectOne(
       service.baseUrl + `/login`
+    );
+    expect(request.request.method).toEqual('POST');
+    request.flush(userDTO);
+  });
+
+  it('should addUser correctly', () => {
+    //Arrange
+    const userDTO: UserDTO = {
+      id: 1,
+      name: "Test User",
+      email: "test@test.com",
+      password: "test123",
+    }
+    //Act
+    service.addUser(userDTO.name, userDTO.email, userDTO.password).subscribe(
+      (responseUser: UserDTO) => {
+        expect(responseUser).toEqual(userDTO);
+      }
+    );
+    //Assert
+    const request = httpTestingController.expectOne(
+      service.baseUrl + `/save`
     );
     expect(request.request.method).toEqual('POST');
     request.flush(userDTO);
