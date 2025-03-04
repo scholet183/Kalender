@@ -8,6 +8,9 @@ import {Appointment} from "../../models/apointment.model";
 })
 export class CalendarService {
   private baseUrl = 'http://localhost:8081/api/calendar';
+  get baseURL(): string {
+    return this.baseUrl;
+  }
 
   constructor(private http: HttpClient) {}
 
