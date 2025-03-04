@@ -3,16 +3,16 @@ on: push
 
 jobs:
   job:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{ github.head_ref }}
-    - name: prepare runner
-      run: |
-        sudo apt install docker.io
-        sudo apt install docker-compose
-    - name: build container
-      run: |
-        cd Kalender/
-        docker-compose up --build 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: prepare runner
+        run: |
+          sudo apt install docker.io
+          sudo apt install docker-compose
+      - name: build container
+        run: |
+          cd Kalender/
+          docker-compose up --build 
