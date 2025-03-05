@@ -19,9 +19,6 @@ jobs:
           docker images
           docker container ls
           docker save $(docker images -q) -o Kalender_App/Kalender_image.tar
-          docker export meine-app -o Kalender_App/meine_app_container.tar
-          docker export kalender-datenbank -o Kalender_App/kalender_datenbank_container.tar
-          docker export user-datenbank -o Kalender_App/user_datenbank_container.tar
       - uses: actions/upload-artifact@v4
         with:
           name: Kalender_App
