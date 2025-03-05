@@ -4,9 +4,7 @@ import { CalendarService } from '../../services/calendarService/calendar.service
 import { AuthService } from '../../services/authService/auth.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
-import { DateClickArg } from '@fullcalendar/interaction';
-import {Appointment} from "../../models/apointment.model";
+import { of } from 'rxjs';
 
 describe('CalenderviewComponent', () => {
   let component: CalenderviewComponent;
