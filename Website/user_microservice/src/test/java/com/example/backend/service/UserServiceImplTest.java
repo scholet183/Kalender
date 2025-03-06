@@ -30,6 +30,7 @@ public class UserServiceImplTest {
         UserDTO userDTO = new UserDTO();
         userDTO.setName("Jane Doe");
         userDTO.setEmail("jane@example.com");
+        userDTO.setPassword("password");
 
         // Save the user via the service
         UserDTO savedUser = userService.saveUser(userDTO);
@@ -54,6 +55,7 @@ public class UserServiceImplTest {
         UserDTO userDTO = new UserDTO();
         userDTO.setName("Mark");
         userDTO.setEmail("mark@example.com");
+        userDTO.setPassword("password");
         UserDTO savedUser = userService.saveUser(userDTO);
 
         // Create an update DTO with the new details
@@ -78,11 +80,13 @@ public class UserServiceImplTest {
         UserDTO user1 = new UserDTO();
         user1.setName("Alice");
         user1.setEmail("alice@example.com");
+        user1.setPassword("password");
         userService.saveUser(user1);
 
         UserDTO user2 = new UserDTO();
         user2.setName("Bob");
         user2.setEmail("bob@example.com");
+        user2.setPassword("password");
         userService.saveUser(user2);
 
         // Retrieve all users via the service
@@ -107,6 +111,7 @@ public class UserServiceImplTest {
         UserDTO userDTO = new UserDTO();
         userDTO.setName("Charlie");
         userDTO.setEmail("charlie@example.com");
+        userDTO.setPassword("password");
         UserDTO savedUser = userService.saveUser(userDTO);
 
         // Retrieve the user using the generated ID
@@ -128,6 +133,7 @@ public class UserServiceImplTest {
         UserDTO userDTO = new UserDTO();
         userDTO.setName("David");
         userDTO.setEmail("david@example.com");
+        userDTO.setPassword("password");
         UserDTO savedUser = userService.saveUser(userDTO);
 
         // Delete the user via the service
@@ -147,6 +153,7 @@ public class UserServiceImplTest {
         UserDTO userDTO = new UserDTO();
         userDTO.setName("Eve");
         userDTO.setEmail("eve@example.com");
+        userDTO.setPassword("password");
         UserDTO savedUser = userService.saveUser(userDTO);
 
         // Create a DTO with the updated name only
