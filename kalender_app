@@ -1,7 +1,7 @@
 server {
     listen 4200;
 
-    root /Kalender/Website/frontend/dist/frontend;  # Direkt auf das dist-Verzeichnis setzen
+    root /app/frontend/browser;  
     index index.html;
     
     location / {

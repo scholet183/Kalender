@@ -52,7 +52,7 @@ RUN npm install -g\
 RUN ng build
 RUN cp -r dist/frontend/ /Kalender/app/
 RUN ls /Kalender/Website/frontend/dist/frontend
-RUN cp /Kalender/kalender_app /etc/nginx/sites-available/
+RUN cp /Kalender/kalender_app /etc/nginx/sites-enabled/
 WORKDIR /
 RUN mv /Kalender/app/ /
 RUN rm -rf /Kalender/
