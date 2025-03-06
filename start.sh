@@ -5,8 +5,7 @@ set -e
 echo "Starte User Microservice..."
 echo "Starte Kalender Microservice..."
 
-cd /Kalender/app
-
+cd /app/
 java -jar *.jar &
  
 # Warten, bis alle gestarteten Prozesse beendet sind
