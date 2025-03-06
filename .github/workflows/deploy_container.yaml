@@ -44,27 +44,3 @@ jobs:
         subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
         subject-digest: ${{ steps.push.outputs.digest }}
         push-to-registry: true
-
-
-#jobs:
-#  job:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          ref: ${{ github.head_ref }}
-#      - name: prepare runner
-#        run: |
-#          sudo apt-get install docker-compose
-#          mkdir Kalender_App
-#      - name: build container
-#        run: |
-#          docker-compose build 
-#          docker images
-#          docker container ls
-#          docker save $(docker images -q) -o Kalender_App/Kalender_image.tar kalender_app:latest
-#          cp compose.yaml Kalender_App/
-#      - uses: actions/upload-artifact@v4
-#        with:
-#          name: Kalender_App
-#          path: Kalender_App/
