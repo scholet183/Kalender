@@ -3,6 +3,7 @@ version: "3.8"
 services:
   app:
     build: .
+    image: kalender_app:latest
     container_name: meine-app
     stdin_open: true  # Hält den Container offen
     tty: true
