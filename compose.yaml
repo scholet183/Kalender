@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   app:
+    build: .
     image: "ghcr.io/scholet183/kalender:workflow_container_deployment"
     container_name: meine-app
     stdin_open: true  # Hält den Container offen
