@@ -15,10 +15,10 @@ jobs:
       - name: build container
         run: |
           docker-compose build 
-          docker-compose up -d
           docker images
           docker container ls
-          docker save $(docker images -q) -o Kalender_App/Kalender_image.tar
+          docker save $(docker images -q) -o Kalender_App/Kalender_image.tar kalender_app:latest
+          cp compose.yaml Kalender_App/
       - uses: actions/upload-artifact@v4
         with:
           name: Kalender_App
