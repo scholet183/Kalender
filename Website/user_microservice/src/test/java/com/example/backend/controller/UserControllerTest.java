@@ -106,15 +106,17 @@ public class UserControllerTest {
         UserDTO updateDto = new UserDTO();
         updateDto.setName("John Updated");
         updateDto.setEmail("john.updated@example.com");
+        updateDto.setPassword("password");
 
         UserDTO updatedUser = new UserDTO();
         updatedUser.setId(1);
         updatedUser.setName("John Updated");
         updatedUser.setEmail("john.updated@example.com");
+        updatedUser.setPassword("password");
 
         Mockito.when(userService.updateUser(eq(1), any(UserDTO.class))).thenReturn(updatedUser);
 
-        mockMvc.perform(put("/api/users/update/1")
+        mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
@@ -129,7 +131,7 @@ public class UserControllerTest {
         // Wir konfigurieren den Mock so, dass er nichts tut.
         Mockito.doNothing().when(userService).deleteUser(eq(1));
 
-        mockMvc.perform(delete("/api/users/delete/1"))
+        mockMvc.perform(delete("/api/users/1"))
                 .andExpect(status().isNoContent());
     }
 
