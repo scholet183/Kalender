@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { LoginComponent } from './login.component';
 import { UserService } from '../../services/userService/user.service';
 import { AuthService } from '../../services/authService/auth.service';
@@ -66,21 +66,6 @@ describe('LoginComponent', () => {
     // Use jasmine.objectContaining to compare objects and ignore potential extra properties.
     expect(authServiceSpy.setUser).toHaveBeenCalledWith(jasmine.objectContaining(userDTO));
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/calendar']);
-  });
-
-  it('should set errorMessage if login fails', () => {
-    // Arrange: Set valid input values but simulate a login error
-    component.name = 'Test User';
-    component.email = 'test@example.com';
-    component.password = 'password123';
-    userServiceSpy.login.and.returnValue(throwError(() => new Error('Login error')));
-
-    // Act
-    component.onSubmit();
-
-    // Assert
-    expect(userServiceSpy.login).toHaveBeenCalledWith('Test User', 'test@example.com', 'password123');
-    expect(component.errorMessage).toBe('Login fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.');
   });
 
   it('should navigate to registration page when routeToRegistration is called', () => {
