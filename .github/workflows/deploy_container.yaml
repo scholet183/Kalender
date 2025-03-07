@@ -24,11 +24,11 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    #- name: Extract metadata (tags, labels) for Docker
-    #  id: meta
-    # uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-    # with:
-    #   images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
     - name: Build and push Docker image
       id: push
@@ -36,8 +36,8 @@ jobs:
       with:
         context: .
         push: true
-        tags: latest #${{ steps.meta.outputs.tags }}
-        labels: app #${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v2
       with:
@@ -63,11 +63,11 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    #- name: Extract metadata (tags, labels) for Docker
-    #  id: meta
-    # uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-    # with:
-    #   images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
     - name: Build and push Docker image
       id: push
@@ -75,8 +75,8 @@ jobs:
       with:
         context: Website/user_microservice/
         push: true
-        tags: latest #${{ steps.meta.outputs.tags }}
-        labels: user_ms #${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v2
       with:
@@ -102,11 +102,11 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    #- name: Extract metadata (tags, labels) for Docker
-    # id: meta
-    #  uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-    #  with:
-    #    images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
     - name: Build and push Docker image
       id: push
@@ -114,8 +114,8 @@ jobs:
       with:
         context: Website/calendar_microservice/
         push: true
-        tags: latest #${{ steps.meta.outputs.tags }}
-        labels: calendar_ms #${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v2
       with:
