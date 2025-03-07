@@ -6,7 +6,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push:
+  build-and-push-app:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,7 +28,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: app_${{ env.REGISTRY }}/app_${{ env.IMAGE_NAME }}
 
     - name: Build and push Docker image
       id: push
@@ -41,6 +41,84 @@ jobs:
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v2
       with:
-        subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+        subject-name: app_${{ env.REGISTRY }}/app_${{ env.IMAGE_NAME }}
+        subject-digest: ${{ steps.push.outputs.digest }}
+        push-to-registry: true
+
+  build-and-push-user:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{github.head_ref}}
+    - name: Log in to the Container registry
+      uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: user_${{ env.REGISTRY }}/user_${{ env.IMAGE_NAME }}
+
+    - name: Build and push Docker image
+      id: push
+      uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      with:
+        context: Website/user-microservice/
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+    - name: Generate artifact attestation
+      uses: actions/attest-build-provenance@v2
+      with:
+        subject-name: user_${{ env.REGISTRY }}/user_${{ env.IMAGE_NAME}}
+        subject-digest: ${{ steps.push.outputs.digest }}
+        push-to-registry: true
+
+  build-and-push-calendar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{github.head_ref}}
+    - name: Log in to the Container registry
+      uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: calendar_${{ env.REGISTRY }}/calendar_${{ env.IMAGE_NAME }}
+
+    - name: Build and push Docker image
+      id: push
+      uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      with:
+        context: Website/calendar-microservice/
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+    - name: Generate artifact attestation
+      uses: actions/attest-build-provenance@v2
+      with:
+        subject-name: calendar_${{ env.REGISTRY }}/calendar_${{ env.IMAGE_NAME}}
         subject-digest: ${{ steps.push.outputs.digest }}
         push-to-registry: true
