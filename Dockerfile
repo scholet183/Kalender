@@ -43,4 +43,4 @@ WORKDIR /
 RUN rm -rf /Kalender/
 # Start-Skript als Container-Befehl festlegen
 
-CMD ["service", "nginx", "start"]
+CMD ["service", "nginx", "start", "&&", "tail", "-f", "/dev/null"]
