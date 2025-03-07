@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   app:
-    image: "ghcr.io/scholet183/calendar:workflow_container_deployment"
+    image: "ghcr.io/scholet183/kalender/app"
     container_name: meine-app
     stdin_open: true  # Hält den Container offen
     tty: true
@@ -15,7 +15,7 @@ services:
       - app-network
 
   user-ms:
-    build: Website/user_microservice/
+    image: "ghcr.io/scholet183/kalender/user"
     container_name: user-microservice
     stdin_open: true  # Hält den Container offen
     tty: true
@@ -27,7 +27,7 @@ services:
       - app-network
 
   calendar-ms:
-    build: Website/calendar_microservice/
+    image: "ghcr.io/scholet183/kalender/calendar"
     container_name: calendar-microservice
     stdin_open: true  # Hält den Container offen
     tty: true
