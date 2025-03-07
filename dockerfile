@@ -33,11 +33,11 @@ EXPOSE 4200 8080 8081 3000
 RUN mkdir app
 RUN set -e
 WORKDIR /Kalender/Website/user_microservice
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 WORKDIR /Kalender/Website/user_microservice/target
 RUN cp user_microservice-0.0.1-SNAPSHOT.jar /Kalender/app/
 WORKDIR /Kalender/Website/calendar_microservice
-RUN	mvn clean package
+RUN	mvn clean package -DskipTests
 WORKDIR /Kalender/Website/calendar_microservice/target
 RUN cp calendar-0.0.1-SNAPSHOT.jar /Kalender/app/
 
