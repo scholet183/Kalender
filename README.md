@@ -2,6 +2,16 @@
 DevOps-Projekt: CRUD-Webapplikation
 
 
+# Setup User-Environment
+benötigte Tools:
+- Docker version 26.1.3, build 26.1.3-0ubuntu1~24.04.1
+- docker-compose version 1.29.2
+
+Step by step:
+1. download: compose.yaml
+2. run: docker-compose --file compose.yaml up
+
+
 # CRUD-Methoden
 Appointments: /api/calendar
 

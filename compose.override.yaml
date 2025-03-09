@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   app:
-    image: "ghcr.io/scholet183/kalender/app"
+    build: .
     container_name: meine-app
     stdin_open: true  # Hält den Container offen
     tty: true
@@ -15,8 +15,7 @@ services:
       - app-network
 
   user-ms:
-    image: "ghcr.io/scholet183/kalender/user"
-    container_name: user-microservice
+    build: Website/user_microservice/
     stdin_open: true  # Hält den Container offen
     tty: true
     ports:
@@ -27,8 +26,7 @@ services:
       - app-network
 
   calendar-ms:
-    image: "ghcr.io/scholet183/kalender/calendar"
-    container_name: calendar-microservice
+    build: Website/calendar_microservice/
     stdin_open: true  # Hält den Container offen
     tty: true
     ports:
