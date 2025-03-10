@@ -1,0 +1,14 @@
+name: test_application
+on: push
+
+jobs:
+  build-and-test-app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{github.head_ref}}
+      - name: test calendar-ms
+        run: docker-compose calendar-ms-test
+      - name: test user-ms
+        run: docker-compose user-ms-test

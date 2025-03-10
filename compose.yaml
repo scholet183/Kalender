@@ -15,7 +15,7 @@ services:
       - app-network
 
   user-ms:
-    image: "ghcr.io/scholet183/kalender/user"
+    image: "ghcr.io/scholet183/kalender/user:latest"
     container_name: user-microservice
     stdin_open: true  # Hält den Container offen
     tty: true
@@ -27,7 +27,7 @@ services:
       - app-network
 
   calendar-ms:
-    image: "ghcr.io/scholet183/kalender/calendar"
+    image: "ghcr.io/scholet183/kalender/calendar:latest"
     container_name: calendar-microservice
     stdin_open: true  # Hält den Container offen
     tty: true
