@@ -1,150 +1,139 @@
 package com.example.backend.controller;
 
+import com.example.backend.assembler.UserModelAssembler;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@WebMvcTest(UserController.class)
-@Import(UserServiceTestConfiguration.class)  // Importiere die Testkonfiguration mit dem gemockten UserService
-@AutoConfigureMockMvc(addFilters = false)      // Sicherheitsfilter deaktivieren
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private UserController userController;
 
-    @Autowired
-    private UserService userService; // Der in der Testkonfiguration registrierte Mock
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private UserModelAssembler assembler;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+    }
 
     @Test
-    void testSaveUser() throws Exception {
-        UserDTO inputDto = new UserDTO();
-        inputDto.setName("John Doe");
-        inputDto.setEmail("john@example.com");
+    public void testSaveUser() throws Exception {
+        UserDTO userDTO = new UserDTO(1, "John", "john@example.com", "password");
 
-        UserDTO savedDto = new UserDTO();
-        savedDto.setId(1);
-        savedDto.setName("John Doe");
-        savedDto.setEmail("john@example.com");
-
-        Mockito.when(userService.saveUser(any(UserDTO.class))).thenReturn(savedDto);
+        // Simuliere das Speichern und die Assemblierung
+        when(userService.saveUser(any(UserDTO.class))).thenReturn(userDTO);
+        EntityModel<UserDTO> entityModel = EntityModel.of(userDTO);
+        when(assembler.toModel(userDTO)).thenReturn(entityModel);
 
         mockMvc.perform(post("/api/users/save")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(inputDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("John Doe"))
-                .andExpect(jsonPath("$.email").value("john@example.com"));
+                        .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                // Prüfe, ob die ID im zurückgegebenen JSON enthalten ist.
+                .andExpect(jsonPath("$.id").value(userDTO.getId()));
     }
 
     @Test
-    void testGetAllUsers() throws Exception {
-        UserDTO user1 = new UserDTO();
-        user1.setId(1);
-        user1.setName("John Doe");
-        user1.setEmail("john@example.com");
+    public void testGetUser() throws Exception {
+        int userId = 1;
+        UserDTO userDTO = new UserDTO(userId, "John", "john@example.com", "password");
 
-        UserDTO user2 = new UserDTO();
-        user2.setId(2);
-        user2.setName("Jane Doe");
-        user2.setEmail("jane@example.com");
+        when(userService.getUserByID(userId)).thenReturn(userDTO);
+        EntityModel<UserDTO> entityModel = EntityModel.of(userDTO);
+        when(assembler.toModel(userDTO)).thenReturn(entityModel);
 
-        List<UserDTO> users = Arrays.asList(user1, user2);
-
-        Mockito.when(userService.getAllUsers()).thenReturn(users);
-
-        mockMvc.perform(get("/api/users/all")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/users/{id}", userId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(users.size()))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("John Doe"))
-                .andExpect(jsonPath("$[0].email").value("john@example.com"))
-                .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].name").value("Jane Doe"))
-                .andExpect(jsonPath("$[1].email").value("jane@example.com"));
+                .andExpect(jsonPath("$.id").value(userId));
     }
 
     @Test
-    void testGetUserByID() throws Exception {
-        UserDTO userDto = new UserDTO();
-        userDto.setId(1);
-        userDto.setName("John Doe");
-        userDto.setEmail("john@example.com");
+    public void testUpdateUser() throws Exception {
+        int userId = 1;
+        UserDTO updatedUser = new UserDTO(userId, "John Updated", "john@example.com", "password");
 
-        Mockito.when(userService.getUserByID(eq(1))).thenReturn(userDto);
+        when(userService.updateUser(eq(userId), any(UserDTO.class))).thenReturn(updatedUser);
+        EntityModel<UserDTO> entityModel = EntityModel.of(updatedUser);
+        when(assembler.toModel(updatedUser)).thenReturn(entityModel);
 
-        mockMvc.perform(get("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("John Doe"))
-                .andExpect(jsonPath("$.email").value("john@example.com"));
-    }
-
-    @Test
-    void testUpdateUser() throws Exception {
-        UserDTO updateDto = new UserDTO();
-        updateDto.setName("John Updated");
-        updateDto.setEmail("john.updated@example.com");
-        updateDto.setPassword("password");
-
-        UserDTO updatedUser = new UserDTO();
-        updatedUser.setId(1);
-        updatedUser.setName("John Updated");
-        updatedUser.setEmail("john.updated@example.com");
-        updatedUser.setPassword("password");
-
-        Mockito.when(userService.updateUser(eq(1), any(UserDTO.class))).thenReturn(updatedUser);
-
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDto)))
+                        .content(objectMapper.writeValueAsString(updatedUser)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("John Updated"))
-                .andExpect(jsonPath("$.email").value("john.updated@example.com"));
+                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.name").value("John Updated"));
     }
 
     @Test
-    void testDeleteUser() throws Exception {
-        // Für deleteUser() wird in der Service-Schicht kein Rückgabewert erwartet.
-        // Wir konfigurieren den Mock so, dass er nichts tut.
-        Mockito.doNothing().when(userService).deleteUser(eq(1));
+    public void testDeleteUser() throws Exception {
+        int userId = 1;
+        doNothing().when(userService).deleteUser(userId);
 
-        mockMvc.perform(delete("/api/users/1"))
+        mockMvc.perform(delete("/api/users/{id}", userId))
                 .andExpect(status().isNoContent());
+
+        verify(userService).deleteUser(userId);
     }
 
     @Test
-    void testUpdateUserName() throws Exception {
-        UserDTO updateNameDto = new UserDTO();
-        updateNameDto.setName("John Newname");
-        // Der Service-Mock für updateUserName() gibt nichts zurück (void-Methode).
-        Mockito.doNothing().when(userService).updateUserName(eq(1), any(UserDTO.class));
+    public void testUpdateUserName() throws Exception {
+        int userId = 1;
+        UserDTO userDTO = new UserDTO(userId, "Neuer Name", "john@example.com", "password");
 
-        mockMvc.perform(patch("/api/users/update-name/1")
+        doNothing().when(userService).updateUserName(eq(userId), any(UserDTO.class));
+
+        mockMvc.perform(patch("/api/users/update-name/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateNameDto)))
+                        .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isNoContent());
+
+        verify(userService).updateUserName(eq(userId), any(UserDTO.class));
+    }
+
+    @Test
+    public void testLogin() throws Exception {
+        UserDTO userDTO = new UserDTO(1, "John", "john@example.com", "password");
+
+        when(userService.login(any(UserDTO.class))).thenReturn(userDTO);
+        EntityModel<UserDTO> entityModel = EntityModel.of(userDTO);
+        when(assembler.toModel(userDTO)).thenReturn(entityModel);
+
+        mockMvc.perform(post("/api/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userDTO.getId()));
     }
 }

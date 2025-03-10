@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.assembler.UserModelAssembler;
 import com.example.backend.service.UserService;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -12,4 +13,7 @@ public class UserServiceTestConfiguration {
     public UserService userService() {
         return Mockito.mock(UserService.class);
     }
+
+    @Bean
+    public UserModelAssembler userModelAssembler() { return Mockito.mock(UserModelAssembler.class); }
 }
