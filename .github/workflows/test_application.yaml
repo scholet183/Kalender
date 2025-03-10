@@ -13,6 +13,6 @@ jobs:
           sudo apt-get update 
           sudo apt-get install docker-compose
       - name: test calendar-ms
-        run: docker-compose calendar-ms-test
+        run: docker-compose up calendar-ms-test
       - name: test user-ms
-        run: docker-compose user-ms-test
+        run: docker-compose up user-ms-test
