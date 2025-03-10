@@ -1,13 +1,25 @@
-name: deploy_container
-on: workflow_call
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+name: test application
+on: push
 
 jobs:
+  test-app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{github.head_ref}}
+      - name: prepare runner
+        run: |
+          sudo apt-get update 
+          sudo apt-get install docker-compose
+      - name: test calendar-ms
+        run: docker-compose up calendar-ms-test
+      - name: test user-ms
+        run: docker-compose up user-ms-test
+
   build-and-push-app:
     runs-on: ubuntu-latest
+    needs: test-app
     permissions:
       contents: read
       packages: write
@@ -49,6 +61,7 @@ jobs:
 
   build-and-push-user:
     runs-on: ubuntu-latest
+    needs: test-app
     permissions:
       contents: read
       packages: write
@@ -90,6 +103,7 @@ jobs:
 
   build-and-push-calendar:
     runs-on: ubuntu-latest
+    needs: test-app
     permissions:
       contents: read
       packages: write
