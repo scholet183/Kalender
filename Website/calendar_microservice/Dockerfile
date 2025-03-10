@@ -15,6 +15,7 @@ COPY . .
  
 EXPOSE 8081
 
+RUN chmod +x test.sh
 RUN mvn clean package -DskipTests
 RUN cp target/calendar-0.0.1-SNAPSHOT.jar /
 

@@ -1,5 +1,5 @@
 name: deploy_container
-on: pull_request
+on: push
 
 env:
   REGISTRY: ghcr.io

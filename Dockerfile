@@ -1,8 +1,9 @@
-FROM openjdk:21-slim
+# STAGE 1: BUILD 
+FROM alpine AS build
  
 # Installiere Maven, npm, curl
 
-RUN apt update && apt install -y \
+RUN apk add \
     npm \
 		nginx \
     curl && \
@@ -14,33 +15,29 @@ WORKDIR /Kalender
 
 COPY . .
  
-# Start-Skript kopieren und ausführbar machen
-
-COPY start.sh /
-
-RUN chmod +x /start.sh
- 
 # Ports freigeben (je nach Bedarf)
 
 EXPOSE 4200 
 
 # build application
 
-RUN apt update -y
 RUN mkdir /app
 WORKDIR /Kalender/Website/frontend
-RUN npm install
-RUN npm install -g\
+RUN npm install && \
+npm install -g\
 		npm@10.9.2\
 	  yarn@1.13.0\
 		node@18.19.1\
 		@angular/cli@19.1.6
-RUN ng build
-RUN cp -r dist/frontend/ /app/
-RUN ls /Kalender/Website/frontend/dist/frontend
-RUN cp /Kalender/kalender_app /etc/nginx/sites-enabled/
-WORKDIR /
-RUN rm -rf /Kalender/
+RUN ng build  
+RUN mv dist/frontend/ /app/ && ls /app/
+#WORKDIR /
+#RUN rm -rf /Kalender/
 # Start-Skript als Container-Befehl festlegen
 
+# STAGE 2: RUNTIME
+FROM nginx:alpine AS prod
+COPY kalender_app /etc/nginx/http.d/kalender_app
+WORKDIR /app
+COPY --from=build /app/ .
 CMD ["nginx", "-g", "daemon off;"]
