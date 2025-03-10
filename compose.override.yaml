@@ -2,7 +2,10 @@ version: "3.8"
 
 services:
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: prod
     container_name: meine-app
     stdin_open: true  # Hält den Container offen
     tty: true
