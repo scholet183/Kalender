@@ -1,5 +1,9 @@
-name: test application
+name: test and deploy application
 on: push
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   test-app:
