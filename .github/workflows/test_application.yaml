@@ -8,6 +8,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{github.head_ref}}
+      - name: prepare runner
+        run: |
+          sudo apt-get update 
+          sudo apt-get install docker-compose
       - name: test calendar-ms
         run: docker-compose calendar-ms-test
       - name: test user-ms
