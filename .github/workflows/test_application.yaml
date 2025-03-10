@@ -1,4 +1,4 @@
-name: test_application
+name: test application
 on: push
 
 jobs:
@@ -16,3 +16,5 @@ jobs:
         run: docker-compose up calendar-ms-test
       - name: test user-ms
         run: docker-compose up user-ms-test
+      - name: call deploy workflow
+        uses: ./.github/workflows/deploy_container.yaml
