@@ -18,7 +18,24 @@ services:
       - app-network
 
   user-ms:
-    build: Website/user_microservice/
+    build: 
+      context: Website/user_microservice/
+      dockerfile: Dockerfile
+      target: prod
+    stdin_open: true  # Hält den Container offen
+    tty: true
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-db
+    networks:
+      - app-network
+
+  user-ms-test:
+    build: 
+      context: Website/user_microservice/
+      dockerfile: Dockerfile
+      target: test
     stdin_open: true  # Hält den Container offen
     tty: true
     ports:
@@ -29,7 +46,10 @@ services:
       - app-network
 
   calendar-ms:
-    build: Website/calendar_microservice/
+    build: 
+      context: Website/calendar_microservice/
+      dockerfile: Dockerfile
+      target: prod
     stdin_open: true  # Hält den Container offen
     tty: true
     ports:
@@ -39,6 +59,19 @@ services:
     networks:
       - app-network
 
+  calendar-ms-test:
+    build: 
+      context: Website/calendar_microservice/
+      dockerfile: Dockerfile
+      target: test
+    stdin_open: true  # Hält den Container offen
+    tty: true
+    ports:
+      - "8081:8081"
+    depends_on:
+      - calendar-db
+    networks:
+      - app-network
 
   user-db:
     image: mariadb:latest

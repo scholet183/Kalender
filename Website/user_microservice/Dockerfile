@@ -1,24 +1,23 @@
-FROM openjdk:21-slim
-
-# Installiere Maven, npm, curl
-
-RUN apt update && apt install -y \
-    maven \
-    curl && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
- 
+############ STAGE 1 ############ 
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS base
 WORKDIR /user_microservice
- 
-# Anwendungscode kopieren
-
 COPY . .
- 
 EXPOSE 8080
+#################################
 
+############ STAGE 2 ############ 
+FROM base AS build
 RUN mvn clean package -DskipTests
-RUN cp target/user_microservice-0.0.1-SNAPSHOT.jar /
+#################################
 
-WORKDIR /
+############ STAGE 3 ############ 
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS prod
+WORKDIR /app
+COPY --from=build /user_microservice/target/user_microservice-0.0.1-SNAPSHOT.jar .
 CMD ["java", "-jar", "user_microservice-0.0.1-SNAPSHOT.jar"]
+#################################
 
-
+############ STAGE 4 ############ 
+FROM base AS test
+CMD ["mvn", "clean", "test" ]
+#################################
