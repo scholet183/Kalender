@@ -11,7 +11,7 @@ RUN mvn clean package -DskipTests
 #################################
 
 ############ STAGE 3 ############ 
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS prod
+FROM eclipse-temurin:21-jre-alpine AS prod
 WORKDIR /app
 COPY --from=build /calendar_microservice/target/calendar-0.0.1-SNAPSHOT.jar .
 CMD ["java", "-jar", "calendar-0.0.1-SNAPSHOT.jar"]
