@@ -1,9 +1,5 @@
 name: deploy_container
-on: 
-  workflow_run:
-    workflows: ["test_application"]
-    types:
-      - completed
+on: workflow_call
 
 env:
   REGISTRY: ghcr.io
