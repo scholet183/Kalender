@@ -68,6 +68,12 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         target: prod
+      env:
+        MARIADB_ROOT_PASSWORD=${{  secrets.MARIADB_ROOT_PASSWORD }}
+        MARIADB_USER_DATABASE=${{  secrets.MARIADB_USER_DATABASE }}
+        MARIADB_CALENDAR_DATABASE=${{  secrets.MARIADB_CALENDAR_DATABASE }}
+        MARIADB_USER=${{  secrets.MARIADB_USER }}
+        MARIADB_PASSWORD=${{  secrets.MARIADB_PASSWORD }}
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v2
       with:
@@ -111,6 +117,12 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         target: prod
+      env:
+        MARIADB_ROOT_PASSWORD=${{  secrets.MARIADB_ROOT_PASSWORD }}
+        MARIADB_USER_DATABASE=${{  secrets.MARIADB_USER_DATABASE }}
+        MARIADB_CALENDAR_DATABASE=${{  secrets.MARIADB_CALENDAR_DATABASE }}
+        MARIADB_USER=${{  secrets.MARIADB_USER }}
+        MARIADB_PASSWORD=${{  secrets.MARIADB_PASSWORD }}
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v2
       with:
@@ -154,6 +166,12 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         target: prod
+      env:
+        MARIADB_ROOT_PASSWORD=${{  secrets.MARIADB_ROOT_PASSWORD }}
+        MARIADB_USER_DATABASE=${{  secrets.MARIADB_USER_DATABASE }}
+        MARIADB_CALENDAR_DATABASE=${{  secrets.MARIADB_CALENDAR_DATABASE }}
+        MARIADB_USER=${{  secrets.MARIADB_USER }}
+        MARIADB_PASSWORD=${{  secrets.MARIADB_PASSWORD }}
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v2
       with:

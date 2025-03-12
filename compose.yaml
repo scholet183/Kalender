@@ -3,9 +3,11 @@ version: "3.8"
 services:
   app:
     image: "ghcr.io/scholet183/kalender/app:latest"
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: prod
     container_name: meine-app
-    stdin_open: true  # Hält den Container offen
-    tty: true
     ports:
       - "4200:4200"
     depends_on:
@@ -16,9 +18,11 @@ services:
 
   user-ms:
     image: "ghcr.io/scholet183/kalender/user:latest"
+    build: 
+      context: Website/user_microservice/
+      dockerfile: Dockerfile
+      target: prod
     container_name: user-microservice
-    stdin_open: true  # Hält den Container offen
-    tty: true
     ports:
       - "8080:8080"
     depends_on:
@@ -26,11 +30,27 @@ services:
     networks:
       - app-network
 
+  user-ms-test:
+    build: 
+      context: Website/user_microservice/
+      dockerfile: Dockerfile
+      target: test
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-db
+    networks:
+      - app-network
+    profiles:
+      - test
+
   calendar-ms:
     image: "ghcr.io/scholet183/kalender/calendar:latest"
+    build: 
+      context: Website/calendar_microservice/
+      dockerfile: Dockerfile
+      target: prod
     container_name: calendar-microservice
-    stdin_open: true  # Hält den Container offen
-    tty: true
     ports:
       - "8081:8081"
     depends_on:
@@ -38,16 +58,29 @@ services:
     networks:
       - app-network
 
+  calendar-ms-test:
+    build: 
+      context: Website/calendar_microservice/
+      dockerfile: Dockerfile
+      target: test
+    ports:
+      - "8081:8081"
+    depends_on:
+      - calendar-db
+    networks:
+      - app-network
+    profiles:
+      - test
 
   user-db:
     image: mariadb:latest
     container_name: user-datenbank
     restart: always
     environment:
-      - MARIADB_ROOT_PASSWORD=verysecret
-      - MARIADB_DATABASE=userdatabase
-      - MARIADB_USER=root
-      - MARIADB_PASSWORD=verysecret
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_USER_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
     ports:
       - "3307:3306"  # User-Datenbank läuft auf Port 3307
     volumes:
@@ -60,10 +93,10 @@ services:
     container_name: calendar-datenbank
     restart: always
     environment:
-      - MARIADB_ROOT_PASSWORD=verysecret
-      - MARIADB_DATABASE=calendardatabase
-      - MARIADB_USER=root
-      - MARIADB_PASSWORD=verysecret
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_CALENDAR_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
     ports:
       - "3308:3306"  # calendar-Datenbank läuft auf Port 3308
     volumes:
