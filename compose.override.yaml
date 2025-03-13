@@ -1,0 +1,20 @@
+# vorher: export GIT_COMMIT=$(git rev-parse HEAD)
+services:
+  app:
+    image: "ghcr.io/scholet183/kalender/app:${GIT_COMMIT}"
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+  user-ms:
+    image: "ghcr.io/scholet183/kalender/user:${GIT_COMMIT}"
+    build: 
+      context: Website/user_microservice/
+      dockerfile: Dockerfile
+      target: prod
+  calendar-ms:
+    image: "ghcr.io/scholet183/kalender/calendar:${GIT_COMMIT}"
+    build: 
+      context: Website/calendar_microservice/
+      dockerfile: Dockerfile
+      target: prod

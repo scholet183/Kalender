@@ -3,14 +3,27 @@ DevOps-Projekt: CRUD-Webapplikation
 
 
 # USAGE
-benötigte Tools:
+## benötigte Tools:
 - Docker version 26.1.3, build 26.1.3-0ubuntu1~24.04.1
 - docker-compose version 1.29.2
 
+## Nutzer:
 Step by step:
 1. download: compose.yaml
-2. run: ``` docker-compose --file compose.yaml up --no-build ```
+1. run: ``` docker-compose --file compose.yaml up ```
 
+
+## Entwickler:
+Step by step:
+1. clone Repo
+1. create .env with needed secrets
+
+Online Version
+1. run: ``` export GIT_COMMIT=$(git rev-parse HEAD) ```
+1. run: ``` docker-compose --no-build up```
+
+lokales Build
+1. run: ``` docker-compose up```
 ---
 
 ---

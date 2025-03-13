@@ -3,10 +3,6 @@ version: "3.8"
 services:
   app:
     image: "ghcr.io/scholet183/kalender/app:latest"
-    build: 
-      context: .
-      dockerfile: Dockerfile
-      target: prod
     container_name: meine-app
     ports:
       - "4200:4200"
@@ -18,10 +14,6 @@ services:
 
   user-ms:
     image: "ghcr.io/scholet183/kalender/user:latest"
-    build: 
-      context: Website/user_microservice/
-      dockerfile: Dockerfile
-      target: prod
     container_name: user-microservice
     ports:
       - "8080:8080"
@@ -46,10 +38,6 @@ services:
 
   calendar-ms:
     image: "ghcr.io/scholet183/kalender/calendar:latest"
-    build: 
-      context: Website/calendar_microservice/
-      dockerfile: Dockerfile
-      target: prod
     container_name: calendar-microservice
     ports:
       - "8081:8081"
