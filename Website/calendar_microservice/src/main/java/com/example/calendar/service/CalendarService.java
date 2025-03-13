@@ -8,4 +8,6 @@ public interface CalendarService {
     Appointment addAppointment(Appointment appointment);
 
     List<Appointment> getAppointmentsById(Integer userId);
+
+    Appointment getAppointmentById(Integer id);
 }
