@@ -16,16 +16,16 @@ Step by step:
 ## Entwickler:
 Step by step:
 1. clone Repo
-1. create .env with needed secrets
+1. run: ``` export GIT_COMMIT=$(git rev-parse HEAD) ```
 
 Online Version
-1. run: ``` export GIT_COMMIT=$(git rev-parse HEAD) ```
-1. run: ``` docker-compose --no-build up```
+1. run: ``` docker-compose pull```
+1. run: ``` docker-compose up --no-build```
 
 lokales Build
-1. run: ``` docker-compose up```
+1. run: ``` docker-compose up --build```
 ---
-
+&Downarrow; tbu &Downarrow;
 ---
 
 # CRUD-Methoden
