@@ -22,7 +22,7 @@ RUN mv dist/frontend/ /app/ && ls /app/
 
 ######## STAGE 2: RUNTIME ########
 FROM nginx:alpine AS prod
-COPY kalender_app /etc/nginx/conf.d/kalender_app.conf
+COPY kalender_app.conf /etc/nginx/conf.d/kalender_app.conf
 WORKDIR /app
 COPY --from=build /app/ .
 CMD ["nginx", "-g", "daemon off;"]
