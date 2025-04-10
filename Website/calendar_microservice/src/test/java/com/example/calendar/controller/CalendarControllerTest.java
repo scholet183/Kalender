@@ -85,4 +85,33 @@ public class CalendarControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(appointmentId));
     }
+
+    @Test
+    public void testUpdateAppointment() throws Exception {
+        // Erstelle einen aktualisierten Termin
+        Appointment updatedAppointment = new Appointment();
+        updatedAppointment.setId(1);
+        updatedAppointment.setTitle("Updated Title");
+        // Setze ggf. weitere Attribute
+
+        when(calendarService.updateAppointment(any(Appointment.class))).thenReturn(updatedAppointment);
+        EntityModel<Appointment> entityModel = EntityModel.of(updatedAppointment);
+        when(assembler.toModel(updatedAppointment)).thenReturn(entityModel);
+
+        mockMvc.perform(put("/api/calendar/{id}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedAppointment)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(updatedAppointment.getId()))
+                .andExpect(jsonPath("$.title").value("Updated Title"));
+    }
+
+    @Test
+    public void testDeleteAppointment() throws Exception {
+        // Simuliere, dass die Löschung erfolgreich ist
+        when(calendarService.deleteAppointment(eq(1))).thenReturn(true);
+
+        mockMvc.perform(delete("/api/calendar/{id}", 1))
+                .andExpect(status().isNoContent());
+    }
 }

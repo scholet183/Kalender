@@ -10,4 +10,8 @@ public interface CalendarService {
     List<Appointment> getAppointmentsById(Integer userId);
 
     Appointment getAppointmentById(Integer id);
+
+    Appointment updateAppointment(Appointment appointment);
+
+    boolean deleteAppointment(Integer id);
 }

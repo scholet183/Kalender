@@ -6,8 +6,10 @@ import com.example.calendar.service.CalendarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,5 +52,23 @@ public class CalendarController {
     public ResponseEntity<EntityModel<Appointment>> getAppointment(@PathVariable Integer id) {
         Appointment appointment = calendarService.getAppointmentById(id);
         return ResponseEntity.ok(assembler.toModel(appointment));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EntityModel<Appointment>> updateAppointment(@PathVariable Integer id, @RequestBody Appointment appointment) {
+        // Sicherstellen, dass die ID im Pfad und im RequestBody übereinstimmen
+        if (appointment.getId() == null || !appointment.getId().equals(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Ungültige ID: Die ID im Pfad und im Body müssen übereinstimmen.");
+        }
+        Appointment updatedAppointment = calendarService.updateAppointment(appointment);
+        return ResponseEntity.ok(assembler.toModel(updatedAppointment));
+    }
+
+    // Endpunkt zum Löschen eines Termins
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAppointment(@PathVariable Integer id) {
+        calendarService.deleteAppointment(id);
+        return ResponseEntity.noContent().build();
     }
 }
