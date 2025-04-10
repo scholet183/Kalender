@@ -5,6 +5,7 @@ import { AuthService } from '../../services/authService/auth.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
+import {Appointment} from "../../models/apointment.model";
 
 describe('CalenderviewComponent', () => {
   let component: CalenderviewComponent;
@@ -58,8 +59,9 @@ describe('CalenderviewComponent', () => {
 
   it('should fetch appointments if a current user is found', () => {
     // Arrange: Provide a mock appointment array
-    const appointments = [
+    const appointments: Appointment[] = [
       {
+        id: 34,
         userId: 1,
         title: 'Appointment 1',
         startDate: '2025-03-05T08:00:00Z',
@@ -77,9 +79,11 @@ describe('CalenderviewComponent', () => {
     expect(calendarServiceSpy.getAppointments).toHaveBeenCalledWith(mockUser.id);
     expect(component.calendarEvents.length).toBe(1);
     expect(component.calendarEvents[0]).toEqual({
+      id: 34,
       title: 'Appointment 1',
       start: '2025-03-05T08:00:00Z',
-      end: '2025-03-05T09:00:00Z'
+      end: '2025-03-05T09:00:00Z',
+      extendedProps: Object({ id: 34, userId: 1, title: 'Appointment 1', startDate: '2025-03-05T08:00:00Z', endDate: '2025-03-05T09:00:00Z' })
     });
     expect(component.calendarOptions.events).toEqual(component.calendarEvents);
   });
