@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CalendarServiceImpl implements CalendarService {
@@ -29,8 +28,23 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     public Appointment getAppointmentById(Integer id) {
+        return calendarRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid appointment id" + id));
+    }
 
+    @Override
+    public Appointment updateAppointment(Appointment appointment) {
+        // Prüfen, ob der Termin existiert (die ID darf nicht null sein)
+        if (appointment.getId() == null || calendarRepository.findById(appointment.getId()).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found with id: " + appointment.getId());
+        }
+        // Der save()-Aufruf aktualisiert den Termin, wenn die ID bereits vorhanden ist
+        return calendarRepository.save(appointment);
+    }
+
+    @Override
+    public boolean deleteAppointment(Integer id) {
         Appointment appointment = calendarRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid appointment id" + id));
-        return appointment;
+        calendarRepository.delete(appointment);
+        return true;
     }
 }

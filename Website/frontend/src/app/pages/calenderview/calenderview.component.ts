@@ -3,15 +3,15 @@ import { CommonModule } from '@angular/common';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions } from '@fullcalendar/core';
+import {CalendarOptions, EventClickArg} from '@fullcalendar/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { EventDialogComponent } from '../../helper/event-dialog/event-dialog.component';
-import { UserDTO } from '../../models/userDTO.model';
 import { Router } from '@angular/router';
 import { MatButton } from '@angular/material/button';
-import {AuthService} from "../../services/authService/auth.service";
-import {CalendarService} from "../../services/calendarService/calendar.service";
-import {Appointment} from "../../models/apointment.model";
+import { AuthService } from "../../services/authService/auth.service";
+import { CalendarService } from "../../services/calendarService/calendar.service";
+import { Appointment } from "../../models/apointment.model";
+import { EventDialogComponent } from '../../helper/event-dialog/event-dialog.component';
+import { UserDTO } from '../../models/userDTO.model';
 
 @Component({
   selector: 'app-calenderview',
@@ -28,6 +28,7 @@ export class CalenderviewComponent implements OnInit {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin, interactionPlugin],
     dateClick: this.handleDateClick.bind(this),
+    eventClick: this.handleEventClick.bind(this),  // Event-Click callback hinzufügen
     events: this.calendarEvents
   };
 
@@ -40,7 +41,7 @@ export class CalenderviewComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    if (this.currentUser == null) {
+    if (!this.currentUser) {
       this.router.navigate(['/login']);
       return;
     }
@@ -52,9 +53,11 @@ export class CalenderviewComponent implements OnInit {
       .subscribe({
         next: (appointments) => {
           this.calendarEvents = appointments.map(appointment => ({
+            id: appointment.id,
             title: appointment.title,
             start: appointment.startDate,
-            end: appointment.endDate
+            end: appointment.endDate,
+            extendedProps: appointment  // Speichert das gesamte Appointment-Objekt
           }));
           this.calendarOptions = { ...this.calendarOptions, events: this.calendarEvents };
         },
@@ -64,9 +67,10 @@ export class CalenderviewComponent implements OnInit {
       });
   }
 
+  // DateClick-Callback für das Erstellen
   handleDateClick(arg: DateClickArg) {
     const dialogRef = this.dialog.open(EventDialogComponent, {
-      data: { clickedDate: arg.dateStr }
+      data: { action: 'create', clickedDate: arg.dateStr }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -80,23 +84,66 @@ export class CalenderviewComponent implements OnInit {
           location: result.location || ''
         };
 
-        // Lokale Kalenderanzeige aktualisieren
-        this.calendarEvents = [...this.calendarEvents, {
-          title: newAppointment.title,
-          start: newAppointment.startDate,
-          end: newAppointment.endDate
-        }];
-        this.calendarOptions = { ...this.calendarOptions, events: this.calendarEvents };
-
-        // Neuen Termin an das Backend senden
         this.calendarService.addAppointment(newAppointment)
           .subscribe({
-            next: response => console.log('Termin erfolgreich gespeichert:', response),
+            next: response => {
+              console.log('Termin erfolgreich gespeichert:', response);
+              this.fetchAppointments();  // Kalender neu laden
+            },
             error: error => console.error('Fehler beim Speichern des Termins:', error)
           });
       }
     });
   }
+
+  handleEventClick(clickInfo: EventClickArg): void {
+    // Annahme: extendedProps enthält das komplette Appointment-Objekt
+    const appointment: Appointment = clickInfo.event.extendedProps as Appointment;
+
+    // Öffnet den Dialog im Bearbeitungsmodus
+    const editDialogRef = this.dialog.open(EventDialogComponent, {
+      width: '400px',
+      data: { action: 'edit', appointment: appointment }
+    });
+
+    editDialogRef.afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      // Falls der Lösch-Button gedrückt wurde
+      if (result.delete) {
+        this.calendarService.deleteAppointment(result.id)
+          .subscribe({
+            next: () => {
+              clickInfo.event.remove();
+              console.log('Termin erfolgreich gelöscht');
+            },
+            error: error => console.error('Fehler beim Löschen des Termins', error)
+          });
+      } else {
+        // Andernfalls handelt es sich um ein Update des Termins
+        const updatedAppointment: Appointment = {
+          id: result.id,
+          title: result.title,
+          startDate: result.start,
+          endDate: result.end,
+          userId: appointment.userId, // Behalte die bestehende User-ID bei
+          description: result.description || '',
+          location: result.location || ''
+        };
+        this.calendarService.updateAppointment(updatedAppointment)
+          .subscribe({
+            next: updated => {
+              console.log('Termin erfolgreich aktualisiert:', updated);
+              this.fetchAppointments(); // Aktualisiert den Kalender
+            },
+            error: error => console.error('Fehler beim Aktualisieren des Termins', error)
+          });
+      }
+    });
+  }
+
+
 
   logout(): void {
     this.authService.logout();

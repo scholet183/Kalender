@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Appointment } from '../../models/apointment.model';
+import {response} from "express";
 
 interface CalendarResponseWrapper {
   _embedded: {
@@ -47,5 +48,21 @@ export class CalendarService {
           return app as Appointment;
         })
       );
+  }
+
+  updateAppointment(appointment: Appointment): Observable<Appointment> {
+    const url = `${this.baseUrl}/${appointment.id}`;
+    return this.http.put<AppointmentResponseWrapper>(url, appointment)
+      .pipe(
+        map(response => {
+          const {_links, ...app} = response;
+          return app as Appointment;
+        })
+      )
+  }
+
+  deleteAppointment(id:number): Observable<Appointment> {
+    const url = `${this.baseUrl}/${id}`;
+    return this.http.delete<Appointment>(url);
   }
 }

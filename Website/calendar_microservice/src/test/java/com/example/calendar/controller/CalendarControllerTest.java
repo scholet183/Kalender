@@ -10,22 +10,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -34,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CalendarControllerTest {
 
     private MockMvc mockMvc;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
     private CalendarController calendarController;
@@ -56,8 +51,6 @@ public class CalendarControllerTest {
         // Erstelle ein Test-Appointment
         Appointment appointment = new Appointment();
         appointment.setId(1);
-        // Falls dein Appointment weitere Attribute wie userId hat, kannst du diese hier setzen.
-
         // Simuliere das Speichern und die Assemblierung
         when(calendarService.addAppointment(any(Appointment.class))).thenReturn(appointment);
         EntityModel<Appointment> entityModel = EntityModel.of(appointment);
@@ -84,5 +77,34 @@ public class CalendarControllerTest {
         mockMvc.perform(get("/api/calendar/{id}", appointmentId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(appointmentId));
+    }
+
+    @Test
+    public void testUpdateAppointment() throws Exception {
+        // Erstelle einen aktualisierten Termin
+        Appointment updatedAppointment = new Appointment();
+        updatedAppointment.setId(1);
+        updatedAppointment.setTitle("Updated Title");
+        // Setze ggf. weitere Attribute
+
+        when(calendarService.updateAppointment(any(Appointment.class))).thenReturn(updatedAppointment);
+        EntityModel<Appointment> entityModel = EntityModel.of(updatedAppointment);
+        when(assembler.toModel(updatedAppointment)).thenReturn(entityModel);
+
+        mockMvc.perform(put("/api/calendar/{id}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedAppointment)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(updatedAppointment.getId()))
+                .andExpect(jsonPath("$.title").value("Updated Title"));
+    }
+
+    @Test
+    public void testDeleteAppointment() throws Exception {
+        // Simuliere, dass die Löschung erfolgreich ist
+        when(calendarService.deleteAppointment(eq(1))).thenReturn(true);
+
+        mockMvc.perform(delete("/api/calendar/{id}", 1))
+                .andExpect(status().isNoContent());
     }
 }
