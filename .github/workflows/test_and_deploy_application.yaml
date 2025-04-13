@@ -36,7 +36,7 @@ jobs:
           sudo apt-get update 
           sudo apt-get install docker-compose
       - name: test calendar-ms
-        run: docker-compose up calendar-ms-test
+        run: docker-compose -f compose.test.yaml -f compose.yaml up calendar-ms-test
 
   test-user-ms:
     runs-on: ubuntu-latest
@@ -49,7 +49,7 @@ jobs:
           sudo apt-get update 
           sudo apt-get install docker-compose
       - name: test user-ms
-        run: docker-compose up user-ms-test
+        run: docker-compose -f compose.test.yaml -f compose.yaml up user-ms-test
 
   build-and-push-app:
     runs-on: ubuntu-latest
