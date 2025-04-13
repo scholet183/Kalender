@@ -11,6 +11,7 @@ DevOps-Projekt: CRUD-Webapplikation
 Step by step:
 1. download: compose.yaml
 1. run: ``` docker-compose --file compose.yaml up ```
+1. open: "http://localhost:4200/login"
 
 
 ## Entwickler:
@@ -52,6 +53,7 @@ PUT /{id} → ein bestimmten Benutzer aktualisieren
 DELETE /{id} → ein bestimmten Benutzer löschen
 
 # Setup Dev-Environment
+![Technologiestack](Docs/Technologiestack.png)
 - npm v10.9.2
 - nodejs v18.19.1
 - java: openjdk-21
