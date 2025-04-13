@@ -30,6 +30,7 @@ lokales Build
 ---
 
 # CRUD-Methoden
+![Technologiestack](Docs/kalender.png)
 Appointments: /api/calendar
 
 POST /addAppointment → Neues Event erstellen
