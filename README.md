@@ -35,7 +35,8 @@ POST /addAppointment → Neues Event erstellen
 
 GET /getAppointments/{id} → Alle Events eines bestimmten Nutzers abrufen
 
-(Not yet implemented)
+PUT /events/{id} → Ein Event aktualisieren
+
 DELETE /events/{id} → Event löschen
 
 User: /api/users
@@ -51,10 +52,10 @@ PUT /{id} → ein bestimmten Benutzer aktualisieren
 DELETE /{id} → ein bestimmten Benutzer löschen
 
 # Setup Dev-Environment
-- npm v10.9.0
-- nodejs v21.6.0
+- npm v10.9.2
+- nodejs v18.19.1
 - java: openjdk-21
-- maven: Apache Maven 3.6.3
+- maven: Apache Maven 3.3.2
 - mariadb  Ver 15.1 Distrib 10.6.18-MariaDB
 - docker
 - docker-compose
