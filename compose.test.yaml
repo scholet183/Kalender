@@ -1,0 +1,24 @@
+services:
+  user-ms-test:
+    build: 
+      context: Website/user_microservice/
+      dockerfile: Dockerfile
+      target: test
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-db
+    networks:
+      - app-network
+
+  calendar-ms-test:
+    build: 
+      context: Website/calendar_microservice/
+      dockerfile: Dockerfile
+      target: test
+    ports:
+      - "8081:8081"
+    depends_on:
+      - calendar-db
+    networks:
+      - app-network
