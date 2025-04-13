@@ -29,8 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{github.head_ref}}
       - name: prepare runner
         run: |
           sudo apt-get update 
@@ -42,8 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{github.head_ref}}
       - name: prepare runner
         run: |
           sudo apt-get update 
@@ -62,8 +58,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{github.head_ref}}
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
@@ -104,8 +98,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{github.head_ref}}
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
@@ -146,8 +138,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{github.head_ref}}
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
