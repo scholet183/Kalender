@@ -27,26 +27,47 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Testklasse für den UserController.
+ * Mithilfe von MockMvc, Mockito und JUnit wird das Verhalten der Endpunkte isoliert getestet,
+ * ohne den kompletten Spring-Kontext zu benötigen.
+ */
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
 
+    // MockMvc ermöglicht das Simulieren von HTTP-Requests an den Controller.
     private MockMvc mockMvc;
+    // ObjectMapper zur Konvertierung von Java-Objekten in JSON und umgekehrt.
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    // Das zu testende Objekt (UserController) wird mit seinen Abhängigkeiten mittels Mockito injiziert.
     @InjectMocks
     private UserController userController;
 
+    // Der UserService wird gemockt, um die Service-Methoden zu simulieren und externe Abhängigkeiten auszublenden.
     @Mock
     private UserService userService;
 
+    // Der UserModelAssembler wird gemockt, um die Erzeugung HATEOAS-konformer EntityModels zu testen.
     @Mock
     private UserModelAssembler assembler;
 
+    /**
+     * SetUp-Methode, die vor jedem Test ausgeführt wird.
+     * Hier wird MockMvc mit dem UserController initialisiert, um HTTP-Anfragen simulieren zu können.
+     */
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
+    /**
+     * Test für den POST-Endpunkt zum Speichern eines neuen Benutzers.
+     * Es wird geprüft, ob der Controller den Benutzer korrekt speichert,
+     * ein passendes HATEOAS-konformes EntityModel zurückgibt und der Location-Header gesetzt wird.
+     *
+     * @throws Exception, falls ein Fehler beim Ausführen des HTTP-Requests auftritt.
+     */
     @Test
     public void testSaveUser() throws Exception {
         UserDTO userDTO = new UserDTO(1, "John", "john@example.com", "password");
@@ -65,6 +86,11 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(userDTO.getId()));
     }
 
+    /**
+     * Test für den GET-Endpunkt zum Abrufen eines einzelnen Benutzers anhand der ID.
+     *
+     * @throws Exception, falls ein Fehler bei der Ausführung des Requests auftritt.
+     */
     @Test
     public void testGetUser() throws Exception {
         int userId = 1;
@@ -79,6 +105,13 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(userId));
     }
 
+    /**
+     * Test für den PUT-Endpunkt zum Aktualisieren eines Benutzers.
+     * Es wird geprüft, ob der Controller nach der Aktualisierung den geänderten Namen
+     * und die korrekte Benutzer-ID zurückliefert.
+     *
+     * @throws Exception, falls ein Fehler beim Ausführen des Requests auftritt.
+     */
     @Test
     public void testUpdateUser() throws Exception {
         int userId = 1;
@@ -96,6 +129,13 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.name").value("John Updated"));
     }
 
+    /**
+     * Test für den DELETE-Endpunkt zum Löschen eines Benutzers.
+     * Es wird überprüft, ob der Controller den Löschvorgang korrekt durchführt
+     * und den HTTP-Status 204 No Content zurückgibt.
+     *
+     * @throws Exception, falls ein Fehler bei der Ausführung des Requests auftritt.
+     */
     @Test
     public void testDeleteUser() throws Exception {
         int userId = 1;
@@ -107,6 +147,12 @@ public class UserControllerTest {
         verify(userService).deleteUser(userId);
     }
 
+    /**
+     * Test für den PATCH-Endpunkt zum Aktualisieren des Benutzernamens.
+     * Es wird getestet, ob der Controller den Namen des Benutzers korrekt aktualisiert.
+     *
+     * @throws Exception, falls ein Fehler beim Ausführen des Requests auftritt.
+     */
     @Test
     public void testUpdateUserName() throws Exception {
         int userId = 1;
@@ -122,6 +168,13 @@ public class UserControllerTest {
         verify(userService).updateUserName(eq(userId), any(UserDTO.class));
     }
 
+    /**
+     * Test für den POST-Endpunkt zum Einloggen eines Benutzers.
+     * Es wird überprüft, ob der Login-Prozess funktioniert und der Benutzer als HATEOAS-konformes
+     * EntityModel zurückgegeben wird.
+     *
+     * @throws Exception, falls ein Fehler bei der Ausführung des Requests auftritt.
+     */
     @Test
     public void testLogin() throws Exception {
         UserDTO userDTO = new UserDTO(1, "John", "john@example.com", "password");
