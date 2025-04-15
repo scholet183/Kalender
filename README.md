@@ -31,6 +31,7 @@ lokales Build
 
 # CRUD-Methoden
 ![Technologiestack](Docs/kalender.png)
+
 Appointments: /api/calendar
 
 POST /addAppointment → Neues Event erstellen
@@ -52,6 +53,9 @@ GET /{id} → ein bestimmten Benutzer erhalten
 PUT /{id} → ein bestimmten Benutzer aktualisieren
 
 DELETE /{id} → ein bestimmten Benutzer löschen
+
+# Workflow
+![Technologiestack](Docs/graph.drawio.png)
 
 # Setup Dev-Environment
 ![Technologiestack](Docs/Technologiestack.png)
