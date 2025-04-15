@@ -25,27 +25,44 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
+/**
+ * Testklasse für den CalendarController.
+ * Nutzt Mockito zur Isolierung von Abhängigkeiten und MockMvc zur Simulation von HTTP-Anfragen.
+ */
 @ExtendWith(MockitoExtension.class)
 public class CalendarControllerTest {
-
+    // MockMvc ermöglicht das Testen von Web-Endpunkten, ohne den vollständigen Servlet-Container zu starten.
     private MockMvc mockMvc;
+    // ObjectMapper zur Serialisierung und Deserialisierung von JSON-Daten.
     private final ObjectMapper objectMapper = new ObjectMapper();
-
+    // Injektion des zu testenden Controllers und Mocks in diese Testklasse.
     @InjectMocks
     private CalendarController calendarController;
-
+    // Mock für den Service, welcher die Geschäftslogik (Appointment-Verwaltung) kapselt.
     @Mock
     private CalendarService calendarService;
-
+    // Mock für den ModelAssembler, der Domain-Objekte in HATEOAS-konforme Darstellungen umwandelt.
     @Mock
     private AppointmentModelAssembler assembler;
 
+    /**
+     * Setup-Methode, die vor jedem Test ausgeführt wird.
+     * Hier wird der ObjectMapper für die HAL-Unterstützung konfiguriert
+     * und die MockMvc-Instanz erstellt, welche den CalendarController isoliert testet.
+     */
     @BeforeEach
     public void setup() {
+        // Registrierung des Jackson2HalModule, um HAL-spezifische JSON-Darstellungen zu unterstützen.
         objectMapper.registerModule(new Jackson2HalModule());
+        // Initialisierung von MockMvc mit dem zu testenden Controller.
         mockMvc = MockMvcBuilders.standaloneSetup(calendarController).build();
     }
 
+    /**
+     * Test für die Erstellung (Speicherung) eines Termins.
+     * Es wird geprüft, ob der POST-Endpunkt einen neuen Termin korrekt speichert und zurückgibt.
+     */
     @Test
     public void testSaveAppointment() throws Exception {
         // Erstelle ein Test-Appointment
@@ -64,6 +81,10 @@ public class CalendarControllerTest {
                 .andExpect(jsonPath("$.id").value(appointment.getId()));
     }
 
+    /**
+     * Test für das Abrufen eines bestehenden Termins über die GET-Methode.
+     * Es wird sichergestellt, dass das richtige Appointment-Objekt zurückgegeben wird.
+     */
     @Test
     public void testGetAppointment() throws Exception {
         int appointmentId = 1;
@@ -79,6 +100,10 @@ public class CalendarControllerTest {
                 .andExpect(jsonPath("$.id").value(appointmentId));
     }
 
+    /**
+     * Test für die Aktualisierung eines bestehenden Termins mittels PUT-Methode.
+     * Der Test validiert, ob die Aktualisierung korrekt erfolgt und die geänderten Felder zurückgegeben werden.
+     */
     @Test
     public void testUpdateAppointment() throws Exception {
         // Erstelle einen aktualisierten Termin
@@ -99,6 +124,10 @@ public class CalendarControllerTest {
                 .andExpect(jsonPath("$.title").value("Updated Title"));
     }
 
+    /**
+     * Test für die Löschung eines bestehenden Termins mittels DELETE-Methode.
+     * Hier wird geprüft, ob der Löschvorgang erfolgreich verläuft und der korrekte HTTP-Status zurückgegeben wird.
+     */
     @Test
     public void testDeleteAppointment() throws Exception {
         // Simuliere, dass die Löschung erfolgreich ist
