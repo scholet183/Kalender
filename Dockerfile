@@ -1,15 +1,18 @@
 ######## STAGE 1: BUILD ########
 FROM alpine AS build
 
+# Build-Argumente für Versionierung
 ARG NG_CLI_VERSION=19.1.6
 
-RUN apk add \
+# Installiere notwendige Pakete
+RUN apk add --no-cache \
     npm \
-		nginx \
-    curl && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    curl
+
 WORKDIR /Kalender
 COPY . .
+
+# Wechsel zum Frontend-Verzeichnis
 WORKDIR /Kalender/Website/frontend
 
 # Installiere notwendige Tools
