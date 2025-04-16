@@ -1,39 +1,48 @@
+# Name des Workflows - beschreibt den Hauptzweck: Erstellen von Releases und Versionieren von Images
 name: Create Release and Version Images
 
+# Trigger-Definitionen - der Workflow wird nur bei geschlossenen Pull Requests auf den main-Branch ausgeführt
 on:
   pull_request:
     types: [closed]
     branches:
       - main
 
+# Umgebungsvariablen für den gesamten Workflow
 env:
+  # Container Registry, in der die Docker-Images gespeichert werden
   REGISTRY: ghcr.io
+  # Image-Name basierend auf dem aktuellen Repository
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # Diesen Job nur ausführen, wenn ein Pull Request auf main gemerged wurde
+  # JOB 1: Inkrementiert die Version und erstellt ein Release
+  # Wird nur ausgeführt, wenn ein Pull Request auf main erfolgreich gemerged wurde
   increment-version:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    # Berechtigungen für das Erstellen von Tags und Releases
     permissions:
       contents: write
+    # Definiert Output-Variablen, die in nachfolgenden Jobs verwendet werden können
     outputs:
       new_version: ${{ steps.version.outputs.version }}
     steps:
+      # Checkout des Repository-Codes mit vollständiger Git-Historie für Tag-Ermittlung
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Vollständige Git-Historie für Tag-Ermittlung
 
-      # Verwendet die Version-Increment-Action, um die nächste Version zu bestimmen
+      # Bestimmt die nächste Version basierend auf der semantischen Versionierung
       - name: Get next version
         id: version
         uses: reecetech/version-increment@2024.10.1
         with:
           scheme: semver
-          increment: patch  # Hier wird die Patch-Version erhöht (z.B. 1.0.1 -> 1.0.2)
+          increment: patch  # Erhöht die Patch-Version (z.B. 1.0.1 -> 1.0.2)
 
-      # Erstellt und pusht den neuen Tag
+      # Konfiguriert Git-Benutzer und erstellt einen neuen Tag für die Version
       - name: Create Git Tag
         run: |
           git config user.name github-actions
@@ -42,7 +51,7 @@ jobs:
           git push origin ${{ steps.version.outputs.version }}
           echo "Neuer Tag erstellt: ${{ steps.version.outputs.version }}"
       
-      # Erstellt ein Release auf GitHub
+      # Erstellt ein GitHub Release basierend auf dem neuen Tag
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -57,10 +66,12 @@ jobs:
           draft: false
           generate_release_notes: true
 
-  # Build und Push der Hauptanwendung
+  # JOB 2: Baut und pushed das Hauptanwendungs-Image mit Versionstags
   build-and-push-versioned-app:
+    # Abhängigkeit vom increment-version Job, um die neue Version zu verwenden
     needs: increment-version
     runs-on: ubuntu-latest
+    # Berechtigungen für GitHub Container Registry und Attestierung
     permissions:
       contents: read
       packages: write
@@ -69,6 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      # Anmelden bei der Container Registry
       - name: Log in to Container registry
         uses: docker/login-action@v3
         with:
@@ -76,7 +88,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      # Extrahiert Metadaten und setzt die Tags
+      # Extrahiert Metadaten für Docker-Image-Tags (Versionsnummer und latest)
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -86,6 +98,7 @@ jobs:
             type=raw,value=${{ needs.increment-version.outputs.new_version }}
             type=raw,value=latest
       
+      # Baut und pushed das Docker-Image mit den erstellten Tags
       - name: Build and push app image
         id: push
         uses: docker/build-push-action@v5
@@ -95,6 +108,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           target: prod
       
+      # Erzeugt Attestierungen über die Build-Herkunft für Sicherheits-Audits
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
@@ -102,10 +116,12 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-  # Build und Push des User-Microservice
+  # JOB 3: Baut und pushed das User-Microservice-Image mit Versionstags
   build-and-push-versioned-user:
+    # Abhängigkeit vom increment-version Job, um die neue Version zu verwenden
     needs: increment-version
     runs-on: ubuntu-latest
+    # Berechtigungen für GitHub Container Registry und Attestierung
     permissions:
       contents: read
       packages: write
@@ -114,6 +130,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      # Anmelden bei der Container Registry
       - name: Log in to Container registry
         uses: docker/login-action@v3
         with:
@@ -121,6 +138,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
+      # Extrahiert Metadaten für Docker-Image-Tags (Versionsnummer und latest)
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -130,6 +148,7 @@ jobs:
             type=raw,value=${{ needs.increment-version.outputs.new_version }}
             type=raw,value=latest
       
+      # Baut und pushed das Docker-Image mit den erstellten Tags
       - name: Build and push user image
         id: push
         uses: docker/build-push-action@v5
@@ -139,6 +158,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           target: prod
       
+      # Erzeugt Attestierungen über die Build-Herkunft für Sicherheits-Audits
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
@@ -146,10 +166,12 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-  # Build und Push des Calendar-Microservice
+  # JOB 4: Baut und pushed das Calendar-Microservice-Image mit Versionstags
   build-and-push-versioned-calendar:
+    # Abhängigkeit vom increment-version Job, um die neue Version zu verwenden
     needs: increment-version
     runs-on: ubuntu-latest
+    # Berechtigungen für GitHub Container Registry und Attestierung
     permissions:
       contents: read
       packages: write
@@ -158,6 +180,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      # Anmelden bei der Container Registry
       - name: Log in to Container registry
         uses: docker/login-action@v3
         with:
@@ -165,6 +188,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
+      # Extrahiert Metadaten für Docker-Image-Tags (Versionsnummer und latest)
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -174,6 +198,7 @@ jobs:
             type=raw,value=${{ needs.increment-version.outputs.new_version }}
             type=raw,value=latest
       
+      # Baut und pushed das Docker-Image mit den erstellten Tags
       - name: Build and push calendar image
         id: push
         uses: docker/build-push-action@v5
@@ -183,6 +208,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           target: prod
       
+      # Erzeugt Attestierungen über die Build-Herkunft für Sicherheits-Audits
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
