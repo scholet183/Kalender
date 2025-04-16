@@ -9,7 +9,8 @@ DevOps-Projekt: CRUD-Webapplikation
 
 ## Nutzer:
 Step by step:
-1. download: compose.yaml
+1. download: compose.yaml 
+1. download: .env
 1. run: ``` docker-compose --file compose.yaml up ```
 1. open: "http://localhost:4200/login"
 
