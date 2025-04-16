@@ -54,7 +54,7 @@ PUT /{id} → ein bestimmten Benutzer aktualisieren
 DELETE /{id} → ein bestimmten Benutzer löschen
 
 # Workflow
-![Technologiestack](Docs/graph.drawio.png)
+![Technologiestack](Docs/Workflow.png)
 
 # Setup Dev-Environment
 ![Technologiestack](Docs/Technologiestack.png)
