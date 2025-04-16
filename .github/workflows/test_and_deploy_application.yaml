@@ -1,21 +1,37 @@
+# Name des Workflows - beschreibt den Hauptzweck: Testen und Bereitstellen der Anwendung
 name: test and deploy application
-on: [push, pull_request]
+# Trigger-Definitionen - der Workflow wird sowohl bei Push-Events als auch bei Pull Requests ausgeführt,
+# was eine kontinuierliche Überprüfung des Codes ermöglicht
+on:
+  push:
+  #pull_request:
+  #  branches: [main]
 
+# Umgebungsvariablen für den gesamten Workflow
 env:
+  # Container Registry, in der die Docker-Images gespeichert werden
   REGISTRY: ghcr.io
+  # Image-Name basierend auf dem aktuellen Repository
   IMAGE_NAME: ${{ github.repository }}
+
+  # Datenbank-Konfigurationen - als GitHub Secrets gespeichert für Sicherheit
   MARIADB_ROOT_PASSWORD: ${{  secrets.MARIADB_ROOT_PASSWORD }}
   MARIADB_USER_DATABASE: ${{  secrets.MARIADB_USER_DATABASE }}
   MARIADB_CALENDAR_DATABASE: ${{  secrets.MARIADB_CALENDAR_DATABASE }}
   MARIADB_USER: ${{  secrets.MARIADB_USER }}
-  MARIADB_PASSWORD: ${{ secrets.MARIADB_USER }}
+  MARIADB_PASSWORD: ${{ secrets.MARIADB_PASSWORD }}
 
 jobs:
+  # JOB 1: Bestimmt den Tag-Namen basierend auf dem Trigger-Event
   check-trigger-event:
     runs-on: ubuntu-latest
+    # Definiert Output-Variablen, die in nachfolgenden Jobs verwendet werden können
     outputs: 
       TAG: ${{ steps.check.outputs.TAG }}
     steps:
+      # Prüft, ob das Event ein Push oder ein Pull Request ist und setzt den Tag entsprechend
+      # Bei Push-Events: Verwendet den Commit-SHA als Tag (Versionierungsstrategie)
+      # Bei PR-Events: Verwendet "latest" als Tag
       - name: check push or pr
         id: check
         run: |
@@ -25,17 +41,25 @@ jobs:
           echo "TAG=latest" >> $GITHUB_OUTPUT
           fi
 
+  # JOB 2: Testet den Calendar-Microservice
   test-calendar-ms:
     runs-on: ubuntu-latest
     steps:
+      # Checkout des Repository-Codes
       - uses: actions/checkout@v4
+
+      # Installation von Docker Compose für die Test-Umgebung
       - name: prepare runner
         run: |
           sudo apt-get update 
           sudo apt-get install docker-compose
+
+      # Führt Tests mit docker-compose aus
+      # Verwendet zwei Compose-Dateien: die Haupt-Compose-Datei und eine Test-spezifische
       - name: test calendar-ms
         run: docker-compose -f compose.test.yaml -f compose.yaml up calendar-ms-test
 
+  # JOB 3: Testet den User-Microservice - ähnliche Struktur wie der Calendar-Test
   test-user-ms:
     runs-on: ubuntu-latest
     steps:
@@ -47,23 +71,29 @@ jobs:
       - name: test user-ms
         run: docker-compose -f compose.test.yaml -f compose.yaml up user-ms-test
 
+  # JOB 4: Baut und pushed das Hauptanwendungs-Image
   build-and-push-app:
     runs-on: ubuntu-latest
+    # Abhängigkeiten: Dieser Job wird nur ausgeführt, wenn alle Tests bestanden wurden
     needs: [test-calendar-ms, test-user-ms, check-trigger-event]
+    # Berechtigungen für GitHub Container Registry und Attestierung
     permissions:
       contents: read
       packages: write
       attestations: write
       id-token: write
-
     steps:
       - uses: actions/checkout@v4
+
+      # Anmelden bei der Container Registry
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extrahiert Metadaten für Docker-Image-Tags und Labels
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
@@ -71,6 +101,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/app
           tags: |
             type=raw,value=${{ needs.check-trigger-event.outputs.TAG }}
+      # Baut und pushed das Docker-Image
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
@@ -87,8 +118,10 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
+  # JOB 5: Baut und pushed das User-Microservice-Image
   build-and-push-user:
     runs-on: ubuntu-latest
+    # Abhängig nur vom User-Test (Microservice-spezifische Abhängigkeit)
     needs: [test-user-ms, check-trigger-event]
     permissions:
       contents: read
@@ -127,6 +160,7 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
+  # JOB 6: Baut und pushed das Calendar-Microservice-Image
   build-and-push-calendar:
     runs-on: ubuntu-latest
     needs: [test-calendar-ms, check-trigger-event]
