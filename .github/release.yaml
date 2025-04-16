@@ -1,0 +1,191 @@
+name: Create Release and Version Images
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Diesen Job nur ausführen, wenn ein Pull Request auf main gemerged wurde
+  increment-version:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      new_version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Vollständige Git-Historie für Tag-Ermittlung
+
+      # Verwendet die Version-Increment-Action, um die nächste Version zu bestimmen
+      - name: Get next version
+        id: version
+        uses: reecetech/version-increment@2024.10.1
+        with:
+          scheme: semver
+          increment: patch  # Hier wird die Patch-Version erhöht (z.B. 1.0.1 -> 1.0.2)
+
+      # Erstellt und pusht den neuen Tag
+      - name: Create Git Tag
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}
+          echo "Neuer Tag erstellt: ${{ steps.version.outputs.version }}"
+      
+      # Erstellt ein Release auf GitHub
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Änderungen in diesem Release
+            
+            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            
+            ${{ github.event.pull_request.body }}
+          draft: false
+          generate_release_notes: true
+
+  # Build und Push der Hauptanwendung
+  build-and-push-versioned-app:
+    needs: increment-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log in to Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      # Extrahiert Metadaten und setzt die Tags
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/app
+          tags: |
+            type=raw,value=${{ needs.increment-version.outputs.new_version }}
+            type=raw,value=latest
+      
+      - name: Build and push app image
+        id: push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          target: prod
+      
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/app
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+
+  # Build und Push des User-Microservice
+  build-and-push-versioned-user:
+    needs: increment-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log in to Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/user
+          tags: |
+            type=raw,value=${{ needs.increment-version.outputs.new_version }}
+            type=raw,value=latest
+      
+      - name: Build and push user image
+        id: push
+        uses: docker/build-push-action@v5
+        with:
+          context: Website/user_microservice/
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          target: prod
+      
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/user
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+
+  # Build und Push des Calendar-Microservice
+  build-and-push-versioned-calendar:
+    needs: increment-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log in to Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/calendar
+          tags: |
+            type=raw,value=${{ needs.increment-version.outputs.new_version }}
+            type=raw,value=latest
+      
+      - name: Build and push calendar image
+        id: push
+        uses: docker/build-push-action@v5
+        with:
+          context: Website/calendar_microservice/
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          target: prod
+      
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/calendar
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
