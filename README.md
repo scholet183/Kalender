@@ -27,8 +27,6 @@ Online Version
 lokales Build
 1. run: ``` docker-compose up --build```
 ---
-&Downarrow; tbu &Downarrow;
----
 
 # CRUD-Methoden
 ![Technologiestack](Docs/kalender.png)
