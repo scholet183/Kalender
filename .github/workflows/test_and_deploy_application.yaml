@@ -1,11 +1,9 @@
 # Name des Workflows - beschreibt den Hauptzweck: Testen und Bereitstellen der Anwendung
 name: test and deploy application
-# Trigger-Definitionen - der Workflow wird sowohl bei Push-Events als auch bei Pull Requests ausgeführt,
+# Trigger-Definitionen - der Workflow wird bei Push-Events ausgeführt,
 # was eine kontinuierliche Überprüfung des Codes ermöglicht
 on:
   push:
-  #pull_request:
-  #  branches: [main]
 
 # Umgebungsvariablen für den gesamten Workflow
 env:
